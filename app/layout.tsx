@@ -15,9 +15,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>
+      <body className="bg-background text-white">
         <Header />
-        {children}
+        <main className="mx-[120px]">{children}</main>
       </body>
     </html>
   );
