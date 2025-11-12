@@ -1,4 +1,6 @@
-const VShapeBackground = () => {
+"use client";
+
+const Achtergrond = () => {
   return (
     <svg
       className="fixed inset-0 pointer-events-none z-0 w-full h-full"
@@ -39,5 +41,4 @@ const VShapeBackground = () => {
   );
 };
 
-export default VShapeBackground;
-
+export default Achtergrond;
