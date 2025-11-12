@@ -3,6 +3,6 @@
 @theme {
   --font-body: "Inter", sans-serif;
 
-  --color-bg-color: #161616;
-  --color-button-color: #202d8d;
+  --color-background: #161616;
+  --color-button: #202d8d;
 }
