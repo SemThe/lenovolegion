@@ -1,1 +1,8 @@
 @import "tailwindcss";
+
+@theme {
+  --font-body: "Inter", sans-serif;
+
+  --color-bg-color: #161616;
+  --color-button-color: #202d8d;
+}
