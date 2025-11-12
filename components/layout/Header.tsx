@@ -9,7 +9,7 @@ import Navlinks from "@/components/layout/NavLinks";
 
 export default function Header() {
   return (
-    <header className="bg-bg-color/50 text-white w-full p-5">
+    <header className="bg-background/50 text-white w-full p-5">
       <nav className="flex items-center justify-between">
         <Link href="/">
           <Image
