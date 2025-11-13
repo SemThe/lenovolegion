@@ -1,10 +1,20 @@
 "use client";
 
+import Image from "next/image";
 import Achtergrond from "../../components/Achtergrond";
+
+type Player = {
+  name: string;
+  price: string;
+  image?: string; // URL of path to player image
+};
 
 const FantasyTeam = () => {
   // Spelers data
-  const papaneusPlayers = [
+  // Voeg een "image" veld toe met een URL of pad naar de afbeelding
+  // Voorbeeld: { name: "Twistzz", price: "6k", image: "/images/twistzz.jpg" }
+  // Of externe URL: { name: "Twistzz", price: "6k", image: "https://example.com/twistzz.jpg" }
+  const papaneusPlayers: Player[] = [
     { name: "Twistzz", price: "6k" },
     { name: "Ultimate", price: "3k" },
     { name: "Nertz", price: "3.5k" },
@@ -12,7 +22,7 @@ const FantasyTeam = () => {
     { name: "Siuhy", price: "3.5k" },
   ];
 
-  const morrogPlayers = [
+  const morrogPlayers: Player[] = [
     { name: "MEZII", price: "3k" },
     { name: "Flamez", price: "5k" },
     { name: "ZTWOO", price: "4k" },
@@ -169,22 +179,35 @@ const FantasyTeam = () => {
                   <div className="absolute top-2 left-2 w-5 h-5 bg-[#f68b32] rounded flex items-center justify-center">
                     <span className="text-white text-xs font-bold">P</span>
                   </div>
-                  {/* Speler foto placeholder */}
-                  <div className="relative w-full aspect-3/4 bg-gray-800 rounded-lg mb-2 flex items-center justify-center">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-16 w-16 text-gray-600"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  {/* Speler foto */}
+                  <div className="relative w-full aspect-3/4 bg-gray-800 rounded-lg mb-2 overflow-hidden">
+                    {player.image ? (
+                      <Image
+                        src={player.image}
+                        alt={player.name}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 20vw, 200px"
+                        unoptimized={player.image.startsWith("http")}
                       />
-                    </svg>
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-16 w-16 text-gray-600"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                          />
+                        </svg>
+                      </div>
+                    )}
                   </div>
                   {/* Speler naam */}
                   <h4 className="text-white font-bold text-base text-center mb-2">
@@ -219,22 +242,35 @@ const FantasyTeam = () => {
                   <div className="absolute top-2 left-2 w-5 h-5 bg-[#ffd94d] rounded flex items-center justify-center z-10">
                     <span className="text-white text-xs font-bold">M</span>
                   </div>
-                  {/* Speler foto placeholder */}
-                  <div className="relative w-full aspect-3/4 bg-gray-800 rounded-lg mb-2 flex items-center justify-center">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-16 w-16 text-gray-600"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  {/* Speler foto */}
+                  <div className="relative w-full aspect-3/4 bg-gray-800 rounded-lg mb-2 overflow-hidden">
+                    {player.image ? (
+                      <Image
+                        src={player.image}
+                        alt={player.name}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 20vw, 200px"
+                        unoptimized={player.image.startsWith("http")}
                       />
-                    </svg>
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-16 w-16 text-gray-600"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                          />
+                        </svg>
+                      </div>
+                    )}
                   </div>
                   {/* Speler naam */}
                   <h4 className="text-white font-bold text-base text-center mb-2">
