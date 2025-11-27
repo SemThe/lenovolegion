@@ -4,6 +4,12 @@ import { useState } from "react";
 import Image from "next/image";
 import Achtergrond from "../../components/Achtergrond";
 
+type Player = {
+  name: string;
+  price: string;
+  image?: string; // URL of path to player image
+};
+
 const FantasyTeam = () => {
   // Sample data voor gevulde spelerkaarten
   const filledPlayers = [
@@ -261,7 +267,24 @@ const FantasyTeam = () => {
                         strokeWidth={2}
                         d="M12 4v16m8-8H4"
                       />
-                    </svg>
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-16 w-16 text-gray-600"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                          />
+                        </svg>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -339,7 +362,24 @@ const FantasyTeam = () => {
                         strokeWidth={2}
                         d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                       />
-                    </svg>
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-16 w-16 text-gray-600"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                          />
+                        </svg>
+                      </div>
+                    )}
                   </div>
 
                   {/* Username */}
