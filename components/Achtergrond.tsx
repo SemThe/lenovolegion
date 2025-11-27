@@ -3,7 +3,7 @@
 const Achtergrond = () => {
   return (
     <svg
-      className="fixed inset-0 pointer-events-none z-0 w-full h-full"
+      className="pointer-events-none w-full h-full"
       viewBox="0 0 100 100"
       preserveAspectRatio="none"
       style={{ overflow: "visible" }}
