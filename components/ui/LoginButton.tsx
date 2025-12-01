@@ -9,7 +9,7 @@ const InlogButton = ({ href, text }: LoginButtonProps) => {
   return (
     <Link
       href={href}
-      className="bg-button h-[35px] w-[75px] rounded-[5px] flex items-center justify-center"
+      className="bg-btn h-[35px] w-[75px] rounded-[5px] flex items-center justify-center"
     >
       {text}
     </Link>
