@@ -15,7 +15,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="bg-bg text-white">
+      <body className="bg-bg text-white font-inter">
         <Header />
         <main className="mx-16 lg:mx-32 mt-20">{children}</main>
       </body>

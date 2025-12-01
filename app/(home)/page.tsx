@@ -7,15 +7,15 @@ import Bracket from "@/components/home/Bracket";
 import BackgroundLines from "@/components/layout/BackgroundLines";
 export default function Home() {
   return (
-    <main className="flex flex-col gap-5 mb-10 ">
+    <main className="flex flex-col gap-5 mb-10 min-h-screen">
       <BackgroundLines />
 
       {/* Boven */}
-      <section className="flex flex-col lg:flex-row justify-between gap-6 ">
+      <section className="flex flex-col lg:flex-row justify-between gap-6 mt-8">
         <div className="flex-1">
           <PlayerCard />
         </div>
-        <div className="flex-[2]">
+        <div className="flex-2">
           <Banner />
         </div>
         <div className="flex-1">
