@@ -1,3 +1,4 @@
+
 import Image from "next/image";
 import PlayerCard from "@/components/home/PlayerCard";
 import Banner from "@/components/home/Banner";
@@ -34,4 +35,5 @@ export default function Home() {
       </section>
     </main>
   );
+
 }
