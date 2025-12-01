@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import Achtergrond from "../../components/Achtergrond";
 
 type Player = {
@@ -238,11 +237,9 @@ const FantasyTeam = () => {
 
                     {/* Team logo in hoek */}
                     <div className="absolute top-2 left-2 w-6 h-6 rounded flex items-center justify-center z-10 overflow-hidden">
-                      <Image
+                      <img
                         src="/images/papaneus.png"
                         alt="Papaneus"
-                        width={24}
-                        height={24}
                         className="w-full h-full object-contain"
                       />
                     </div>
@@ -551,11 +548,9 @@ const FantasyTeam = () => {
                     <div className="flex items-center gap-2">
                       {/* Team logo */}
                       <div className="w-4 h-4 rounded flex items-center justify-center shrink-0 overflow-hidden">
-                        <Image
+                        <img
                           src={player.team === "PAPANEUS" ? "/images/papaneus.png" : "/images/morrog.png"}
                           alt={player.team}
-                          width={16}
-                          height={16}
                           className="w-full h-full object-contain"
                         />
                       </div>
