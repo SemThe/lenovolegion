@@ -1,5 +1,5 @@
-import Image from "next/image";
+import FantasyTeam from "../fantasyteam/fantasyteam";
 
 export default function Home() {
-  return <></>;
+  return <FantasyTeam />;
 }
