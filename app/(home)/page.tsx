@@ -8,7 +8,7 @@ import Bracket from "@/components/home/Bracket";
 import BackgroundLines from "@/components/layout/BackgroundLines";
 export default function Home() {
   return (
-    <main className="flex flex-col gap-5 mb-10 min-h-screen">
+    <main className="flex flex-col gap-5 mb-10 min-h-screen mx-16 lg:mx-32 mt-20">
       <BackgroundLines />
 
       {/* Boven */}
