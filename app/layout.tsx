@@ -15,7 +15,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="bg-bg text-white font-inter">
+      <body className="bg-bg text-white font-inter overflow-hidden">
         <Header />
         <main>{children}</main>
       </body>

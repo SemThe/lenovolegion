@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Achtergrond from "../../components/Achtergrond";
 
 type Player = {
@@ -24,8 +24,8 @@ const FantasyTeam = () => {
   
   // State voor geselecteerde spelers
   const [mySquadPlayers, setMySquadPlayers] = useState<(AvailablePlayer | null)[]>([
-    { name: "TWISTZZ", value: "3K", team: "PAPANEUS", teamColor: "orange", isSelected: true },
-    { name: "NERTZ", value: "2.5K", team: "PAPANEUS", teamColor: "orange", isSelected: true },
+    null,
+    null,
     null,
     null,
     null,
@@ -74,18 +74,68 @@ const FantasyTeam = () => {
   // Bereken resterend budget
   const remainingBudget = START_BUDGET - calculateTotalSpent();
 
+  // Functie om team op te slaan in localStorage
+  const saveTeamToLocalStorage = () => {
+    if (typeof window === 'undefined') return;
+    
+    try {
+      const teamData = {
+        mySquad: mySquadPlayers,
+        subs: subsPlayers,
+        timestamp: new Date().toISOString(),
+      };
+      localStorage.setItem('fantasyTeam', JSON.stringify(teamData));
+      console.log('Team opgeslagen in localStorage');
+    } catch (error) {
+      console.error('Error saving team to localStorage:', error);
+    }
+  };
+
+  // Functie om team te laden uit localStorage
+  const loadTeamFromLocalStorage = () => {
+    if (typeof window === 'undefined') return;
+    
+    try {
+      const savedTeam = localStorage.getItem('fantasyTeam');
+      if (savedTeam) {
+        const teamData = JSON.parse(savedTeam);
+        setMySquadPlayers(teamData.mySquad || [null, null, null, null, null]);
+        setSubsPlayers(teamData.subs || [null, null]);
+        console.log('Team geladen uit localStorage');
+      }
+    } catch (error) {
+      console.error('Error loading team from localStorage:', error);
+    }
+  };
+
+  // Laad team bij mount
+  useEffect(() => {
+    loadTeamFromLocalStorage();
+  }, []);
+
+  // Sla team automatisch op wanneer spelers worden toegevoegd/verwijderd (debounced)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      saveTeamToLocalStorage();
+    }, 500); // Debounce: save 0.5 second after last change
+
+    return () => clearTimeout(timer);
+  }, [mySquadPlayers, subsPlayers]);
+
+
   // Beschikbare spelers voor selectie
   const [availablePlayers, setAvailablePlayers] = useState<AvailablePlayer[]>([
-    { name: "TWISTZZ", value: "3K", team: "PAPANEUS", teamColor: "orange", isSelected: true },
+    { name: "TWISTZZ", value: "3K", team: "PAPANEUS", teamColor: "orange", isSelected: false },
     { name: "FLAMEZ", value: "3.5K", team: "MORROG", teamColor: "yellow", isSelected: false },
     { name: "ULTIMATE", value: "2K", team: "PAPANEUS", teamColor: "orange", isSelected: false },
-    { name: "NERTZ", value: "2.5K", team: "PAPANEUS", teamColor: "orange", isSelected: true },
+    { name: "NERTZ", value: "2.5K", team: "PAPANEUS", teamColor: "orange", isSelected: false },
     { name: "NAF", value: "2K", team: "PAPANEUS", teamColor: "orange", isSelected: false },
     { name: "SIUHY", value: "2.5K", team: "PAPANEUS", teamColor: "orange", isSelected: false },
     { name: "MEZII", value: "3K", team: "MORROG", teamColor: "yellow", isSelected: false },
     { name: "ZTWOO", value: "1K", team: "MORROG", teamColor: "yellow", isSelected: false },
     { name: "ROPZ", value: "2K", team: "MORROG", teamColor: "yellow", isSelected: false },
   ]);
+
 
   // Functie om speler toe te voegen aan My Squad of Subs
   const handleAddPlayer = (player: AvailablePlayer) => {
@@ -155,7 +205,7 @@ const FantasyTeam = () => {
   const userRank = { rank: 150, username: "Jij", xp: "80 XP", avatar: null };
 
   return (
-    <div className="relative min-h-screen bg-[#0b0b0b] overflow-hidden">
+    <div className="relative h-screen bg-[#0b0b0b] overflow-hidden">
       {/* Achtergrond met V-vormige lichtbundels */}
       <div className="absolute inset-0 z-0">
         <Achtergrond />
@@ -163,59 +213,45 @@ const FantasyTeam = () => {
 
       <div className="relative z-10">
         {/* Hoofdcontent */}
-        <div className="w-full px-6 pt-32 pb-24 flex gap-8">
+        <div className="w-full px-6 pt-24 pb-24 flex gap-8 overflow-visible">
           {/* Linkerzijde - Fantasyteam sectie */}
-          <div className="flex-1">
-            {/* Titel */}
-            <div className="flex items-center justify-center gap-2 mb-6">
-              <div className="bg-[#f68b32] rounded-lg p-1.5">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 text-white"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M12 2C10.5 2 9 3 9 4.5v2c0 1.5 1.5 2.5 3 2.5s3-1 3-2.5v-2C15 3 13.5 2 12 2z"
-                  />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M9 7h6M8 8v8h8V8M10 10h4M10 12h4M10 14h4"
-                  />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M7 16h10M6 18h12"
-                  />
-                </svg>
+          <div className="flex-1 overflow-visible">
+            {/* Titel Banner */}
+            <div className="rounded-lg px-6 py-4 mb-6 flex items-center gap-3">
+              {/* Linkerzijde - Tekst */}
+              <div className="flex flex-col">
+                <h1 className="text-white font-bold text-lg leading-tight">Lenovo</h1>
+                <h1 className="text-white font-bold text-lg leading-tight">Fantasyteam</h1>
               </div>
-              <h1 className="text-xl font-bold text-white">Lenovo Fantasyteam</h1>
+              {/* Rechterzijde - CS:GO Logo */}
+              <div className="w-15 h-15 rounded-lg overflow-hidden ">
+                <img
+                  src="/images/csgo.png"
+                  alt="CS:GO Logo"
+                  className="w-full h-full object-cover"
+                />
+              </div>
             </div>
 
             {/* My Squad sectie */}
             <div className="mb-6">
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="text-base font-bold text-white">My Squad</h2>
-                {/* Puntentelling knop rechts */}
+              <div className="flex items-center gap-4 mb-3">
+                <h2 className="text-base font-bold text-white ml-6 w-20">My Squad</h2>
+                {/* Puntentelling knop */}
                 <button
                   type="button"
-                  className="bg-[#2b5eff] hover:bg-[#1e4fe6] text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
+                  className="bg-[#2b5eff] hover:bg-[#1e4fe6] text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors ml-265"
                 >
                   Puntentelling
                 </button>
               </div>
-              <div className="flex gap-4 flex-wrap justify-center">
+              <div className="flex gap-4 flex-wrap justify-center overflow-visible">
                 {/* My Squad spelerkaarten */}
                 {mySquadPlayers.map((player, index) => (
                   player ? (
                     <div
                       key={index}
-                      className="w-40 h-52 rounded-2xl overflow-hidden shadow-lg relative border-2 border-[#f68b32]"
+                      className="w-48 h-48 rounded-2xl overflow-hidden shadow-lg relative border-2 border-[#f68b32] bg-[#1a1a1a] flex flex-col"
                     >
                       {/* Prullenbak icoon rechtsboven */}
                       <button
@@ -241,7 +277,7 @@ const FantasyTeam = () => {
                       </button>
 
                       {/* Team logo in hoek */}
-                      <div className="absolute top-2 left-2 w-6 h-6 rounded flex items-center justify-center z-10 overflow-hidden">
+                      <div className="absolute top-2 left-2 w-12 h-12 rounded flex items-center justify-center z-10 overflow-hidden">
                         <img
                           src={player.team === "PAPANEUS" ? "/images/papaneus.png" : "/images/morrog.png"}
                           alt={player.team}
@@ -250,10 +286,10 @@ const FantasyTeam = () => {
                       </div>
 
                       {/* Speler afbeelding */}
-                      <div className="w-full h-32 bg-gray-800 flex items-center justify-center">
+                      <div className="w-full h-32 bg-gray-800 flex items-center justify-center shrink-0">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
-                          className="h-16 w-16 text-gray-600"
+                          className="h-20 w-20 text-gray-600"
                           fill="none"
                           viewBox="0 0 24 24"
                           stroke="currentColor"
@@ -268,12 +304,14 @@ const FantasyTeam = () => {
                       </div>
 
                       {/* Naamtag op donkere balk */}
-                      <div className="bg-[#1a1a1a] px-3 py-2">
-                        <h3 className="text-white font-semibold text-sm text-center mb-1">
+                      <div className="bg-[#1a1a1a] px-1 py-4 flex flex-col justify-center shrink">
+                        <h3 className="text-white font-semibold text-sm text-center pt-1">
                           {player.name}
                         </h3>
+                        {/* Lijn met fade */}
+                        <div className="w-full h-px bg-linear-to-r from-transparent via-gray-600 to-transparent my-0.5"></div>
                         {/* Waarde */}
-                        <div className="text-center">
+                        <div className="text-center pb-1">
                           <span className="text-gray-300 text-xs">{player.value}</span>
                         </div>
                       </div>
@@ -281,7 +319,7 @@ const FantasyTeam = () => {
                   ) : (
                     <div
                       key={index}
-                      className="w-40 h-52 rounded-2xl border-2 border-dashed border-[#f68b32] bg-[#f68b32]/10 flex items-center justify-center shadow-lg cursor-pointer hover:bg-[#f68b32]/20 transition-colors"
+                      className="w-48 h-48 rounded-2xl border-2 border-dashed border-[#f68b32] bg-[#f68b32]/10 flex items-center justify-center shadow-lg cursor-pointer hover:bg-[#f68b32]/20 transition-colors"
                       onClick={() => handleOpenPlayerModal("MySquad", index)}
                     >
                       <svg
@@ -304,15 +342,20 @@ const FantasyTeam = () => {
               </div>
             </div>
 
+            {/* Scheidingslijn */}
+            <div className="flex justify-center my-4">
+              <div className="w-3/4 h-px bg-linear-to-r from-transparent via-gray-700 to-transparent"></div>
+            </div>
+
             {/* Subs sectie */}
             <div className="mb-6">
-              <h2 className="text-base font-bold text-white mb-3">Subs</h2>
-              <div className="flex gap-4 items-center justify-center">
+              <h2 className="text-base font-bold text-white mb-3 ml-6">Subs</h2>
+              <div className="flex gap-4 items-center justify-center overflow-visible">
                 {subsPlayers.map((player, index) => (
                   player ? (
                     <div
                       key={index}
-                      className="w-40 h-52 rounded-2xl overflow-hidden shadow-lg relative border-2 border-[#2b5eff]"
+                      className="w-48 h-48 rounded-2xl overflow-hidden shadow-lg relative border-2 border-[#2b5eff] bg-[#1a1a1a] flex flex-col"
                     >
                       {/* Prullenbak icoon rechtsboven */}
                       <button
@@ -338,7 +381,7 @@ const FantasyTeam = () => {
                       </button>
 
                       {/* Team logo in hoek */}
-                      <div className="absolute top-2 left-2 w-6 h-6 rounded flex items-center justify-center z-10 overflow-hidden">
+                      <div className="absolute top-2 left-2 w-12 h-12 rounded flex items-center justify-center z-10 overflow-hidden">
                         <img
                           src={player.team === "PAPANEUS" ? "/images/papaneus.png" : "/images/morrog.png"}
                           alt={player.team}
@@ -347,10 +390,10 @@ const FantasyTeam = () => {
                       </div>
 
                       {/* Speler afbeelding */}
-                      <div className="w-full h-32 bg-gray-800 flex items-center justify-center">
+                      <div className="w-full h-32 bg-gray-800 flex items-center justify-center shrink-0">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
-                          className="h-16 w-16 text-gray-600"
+                          className="h-20 w-20 text-gray-600"
                           fill="none"
                           viewBox="0 0 24 24"
                           stroke="currentColor"
@@ -365,12 +408,14 @@ const FantasyTeam = () => {
                       </div>
 
                       {/* Naamtag op donkere balk */}
-                      <div className="bg-[#1a1a1a] px-3 py-2">
-                        <h3 className="text-white font-semibold text-sm text-center mb-1">
+                      <div className="bg-[#1a1a1a] px-3 py-0 flex flex-col justify-center shrink-0">
+                        <h3 className="text-white font-semibold text-sm text-center pt-1">
                           {player.name}
                         </h3>
+                        {/* Lijn met fade */}
+                        <div className="w-full h-px bg-linear-to-r from-transparent via-gray-600 to-transparent my-0.5"></div>
                         {/* Waarde */}
-                        <div className="text-center">
+                        <div className="text-center pb-1">
                           <span className="text-gray-300 text-xs">{player.value}</span>
                         </div>
                       </div>
@@ -378,7 +423,7 @@ const FantasyTeam = () => {
                   ) : (
                     <div
                       key={index}
-                      className="w-40 h-52 rounded-2xl border-2 border-dashed border-[#2b5eff] bg-[#2b5eff]/10 flex items-center justify-center shadow-lg cursor-pointer hover:bg-[#2b5eff]/20 transition-colors"
+                      className="w-48 h-48 rounded-2xl border-2 border-dashed border-[#2b5eff] bg-[#2b5eff]/10 flex items-center justify-center shadow-lg cursor-pointer hover:bg-[#2b5eff]/20 transition-colors"
                       onClick={() => handleOpenPlayerModal("Subs", index)}
                     >
                       <svg
@@ -403,21 +448,20 @@ const FantasyTeam = () => {
           </div>
 
           {/* Rechterzijpaneel - Top 10 */}
-          <div className="w-72 bg-[#1a1a1a] rounded-2xl p-4 shadow-lg mt-8">
-            <h2 className="text-base font-bold text-white mb-3">Top 10</h2>
+          <div className="w-[353px] bg-[#1a1a1a] rounded-2xl p-[21px] shadow-lg mt-4">
+            <h2 className="text-base font-bold text-white mb-[17px]">Top 10</h2>
 
-            {/* Top 10 lijst */}
-            <div className="space-y-2 mb-4">
+            <div className="space-y-[11px] mb-4">
               {top10.map((player) => (
                 <div
                   key={player.rank}
-                  className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-[#0c0c0c] transition-colors"
+                  className="flex items-center gap-[13px] p-[9px] rounded-lg hover:bg-[#0c0c0c] transition-colors"
                 >
                   {/* Rangnummer */}
-                  <span className="text-gray-400 font-bold text-xs w-6">#{player.rank}</span>
+                  <span className="text-gray-400 font-bold text-xs w-7">#{player.rank}</span>
 
                   {/* Avatar */}
-                  <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center shrink-0">
+                  <div className="w-[37px] h-[37px] rounded-full bg-gray-700 flex items-center justify-center shrink-0">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       className="h-4 w-4 text-gray-400"
@@ -434,27 +478,27 @@ const FantasyTeam = () => {
                     </svg>
                   </div>
 
-                  {/* Username */}
+                  
                   <span className="text-white text-xs font-medium flex-1 truncate">
                     {player.username}
                   </span>
 
-                  {/* XP badge */}
-                  <span className="bg-gray-700 text-gray-300 text-[10px] px-2 py-0.5 rounded-full">
+                  
+                  <span className="bg-gray-700 text-gray-300 text-[10px] px-[13px] py-1 rounded-full">
                     {player.xp}
                   </span>
                 </div>
               ))}
             </div>
 
-            {/* Eigen positie */}
-            <div className="border-t border-gray-700 pt-3">
-              <div className="flex items-center gap-2 p-2 rounded-lg bg-[#0c0c0c]">
-                {/* Rangnummer */}
-                <span className="text-gray-400 font-bold text-xs w-6">#{userRank.rank}</span>
+          
+            <div className="border-t border-gray-700 pt-[17px]">
+              <div className="flex items-center gap-[13px] p-[9px] rounded-lg bg-[#0c0c0c]">
+              
+                <span className="text-gray-400 font-bold text-xs w-7">#{userRank.rank}</span>
 
-                {/* Avatar */}
-                <div className="w-8 h-8 rounded-full bg-[#2b5eff] flex items-center justify-center shrink-0">
+                
+                <div className="w-[37px] h-[37px] rounded-full bg-[#2b5eff] flex items-center justify-center shrink-0">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-4 w-4 text-white"
@@ -475,7 +519,7 @@ const FantasyTeam = () => {
                 <span className="text-white text-xs font-medium flex-1 truncate">{userRank.username}</span>
 
                 {/* XP badge */}
-                <span className="bg-gray-700 text-gray-300 text-[10px] px-2 py-0.5 rounded-full">
+                <span className="bg-gray-700 text-gray-300 text-[10px] px-[13px] py-1 rounded-full">
                   {userRank.xp}
                 </span>
               </div>
@@ -484,9 +528,9 @@ const FantasyTeam = () => {
         </div>
 
         {/* Budget en Opslaan - Fixed onderaan */}
-        <div className="fixed bottom-0 left-0 right-0 z-20 bg-[#0c0c0c] border-t border-gray-800">
-          <div className="max-w-[1400px] mx-auto px-6 py-4">
-            <div className="flex items-center justify-between bg-[#1a1a1a] rounded-xl px-6 py-4">
+        <div className="fixed bottom-0 left-0 z-20 bg-[#0c0c0c]">
+          <div className="px-6 py-4">
+            <div className="flex items-center justify-between bg-[#1a1a1a] rounded-xl px-6 py-4" style={{ width: 'calc((118vw - 3rem) * 0.65)' }}>
               <div className="flex items-center gap-2">
                 <span className="text-white font-semibold">Budget:</span>
                 <span className={`font-bold text-lg ${remainingBudget < 0 ? "text-red-500" : "text-[#2b5eff]"}`}>
