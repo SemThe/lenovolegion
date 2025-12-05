@@ -2,12 +2,7 @@
 
 import { useState } from "react";
 import Achtergrond from "../../components/Achtergrond";
-
-type Player = {
-  name: string;
-  price: string;
-  image?: string; // URL of path to player image
-};
+import Image from "next/image";
 
 type AvailablePlayer = {
   name: string;
@@ -39,15 +34,69 @@ const FantasyTeam = () => {
 
   // Beschikbare spelers voor selectie
   const [availablePlayers, setAvailablePlayers] = useState<AvailablePlayer[]>([
-    { name: "TWISTZZ", value: "3K", team: "PAPANEUS", teamColor: "orange", isSelected: true },
-    { name: "FLAMEZ", value: "3.5K", team: "MORROG", teamColor: "yellow", isSelected: false },
-    { name: "ULTIMATE", value: "2K", team: "PAPANEUS", teamColor: "orange", isSelected: false },
-    { name: "NERTZ", value: "2.5K", team: "PAPANEUS", teamColor: "orange", isSelected: true },
-    { name: "NAF", value: "2K", team: "PAPANEUS", teamColor: "orange", isSelected: false },
-    { name: "SIUHY", value: "2.5K", team: "PAPANEUS", teamColor: "orange", isSelected: false },
-    { name: "MEZII", value: "3K", team: "MORROG", teamColor: "yellow", isSelected: false },
-    { name: "ZTWOO", value: "1K", team: "MORROG", teamColor: "yellow", isSelected: false },
-    { name: "ROPZ", value: "2K", team: "MORROG", teamColor: "yellow", isSelected: false },
+    {
+      name: "TWISTZZ",
+      value: "3K",
+      team: "PAPANEUS",
+      teamColor: "orange",
+      isSelected: true,
+    },
+    {
+      name: "FLAMEZ",
+      value: "3.5K",
+      team: "MORROG",
+      teamColor: "yellow",
+      isSelected: false,
+    },
+    {
+      name: "ULTIMATE",
+      value: "2K",
+      team: "PAPANEUS",
+      teamColor: "orange",
+      isSelected: false,
+    },
+    {
+      name: "NERTZ",
+      value: "2.5K",
+      team: "PAPANEUS",
+      teamColor: "orange",
+      isSelected: true,
+    },
+    {
+      name: "NAF",
+      value: "2K",
+      team: "PAPANEUS",
+      teamColor: "orange",
+      isSelected: false,
+    },
+    {
+      name: "SIUHY",
+      value: "2.5K",
+      team: "PAPANEUS",
+      teamColor: "orange",
+      isSelected: false,
+    },
+    {
+      name: "MEZII",
+      value: "3K",
+      team: "MORROG",
+      teamColor: "yellow",
+      isSelected: false,
+    },
+    {
+      name: "ZTWOO",
+      value: "1K",
+      team: "MORROG",
+      teamColor: "yellow",
+      isSelected: false,
+    },
+    {
+      name: "ROPZ",
+      value: "2K",
+      team: "MORROG",
+      teamColor: "yellow",
+      isSelected: false,
+    },
   ]);
 
   // Sample data voor Top 10
@@ -81,22 +130,37 @@ const FantasyTeam = () => {
             <div className="flex items-center gap-8">
               {/* Logo */}
               <div className="text-white font-bold text-xl">LOGO</div>
-              
+
               {/* Menu items */}
               <div className="flex items-center gap-6">
-                <a href="#" className="text-white text-sm hover:text-[#2b5eff] transition-colors">
+                <a
+                  href="#"
+                  className="text-white text-sm hover:text-[#2b5eff] transition-colors"
+                >
                   Home
                 </a>
-                <a href="#" className="text-white text-sm hover:text-[#2b5eff] transition-colors">
+                <a
+                  href="#"
+                  className="text-white text-sm hover:text-[#2b5eff] transition-colors"
+                >
                   Toernooien
                 </a>
-                <a href="#" className="text-white text-sm hover:text-[#2b5eff] transition-colors">
+                <a
+                  href="#"
+                  className="text-white text-sm hover:text-[#2b5eff] transition-colors"
+                >
                   Bracket
                 </a>
-                <a href="#" className="text-white text-sm hover:text-[#2b5eff] transition-colors">
+                <a
+                  href="#"
+                  className="text-white text-sm hover:text-[#2b5eff] transition-colors"
+                >
                   Wedstrijden
                 </a>
-                <a href="#" className="text-white text-sm font-semibold hover:text-[#2b5eff] transition-colors">
+                <a
+                  href="#"
+                  className="text-white text-sm font-semibold hover:text-[#2b5eff] transition-colors"
+                >
                   Fantasyteam
                 </a>
               </div>
@@ -191,7 +255,9 @@ const FantasyTeam = () => {
                   />
                 </svg>
               </div>
-              <h1 className="text-2xl font-bold text-white">Lenovo Fantasyteam</h1>
+              <h1 className="text-2xl font-bold text-white">
+                Lenovo Fantasyteam
+              </h1>
             </div>
 
             {/* My Squad sectie */}
@@ -237,10 +303,11 @@ const FantasyTeam = () => {
 
                     {/* Team logo in hoek */}
                     <div className="absolute top-2 left-2 w-6 h-6 rounded flex items-center justify-center z-10 overflow-hidden">
-                      <img
+                      <Image
                         src="/images/papaneus.png"
                         alt="Papaneus"
-                        className="w-full h-full object-contain"
+                        fill
+                        className="object-contain"
                       />
                     </div>
 
@@ -269,7 +336,9 @@ const FantasyTeam = () => {
                       </h3>
                       {/* Waarde */}
                       <div className="text-center">
-                        <span className="text-gray-300 text-xs">{player.value}</span>
+                        <span className="text-gray-300 text-xs">
+                          {player.value}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -343,7 +412,9 @@ const FantasyTeam = () => {
                   className="flex items-center gap-3 p-2 rounded-lg hover:bg-[#0c0c0c] transition-colors"
                 >
                   {/* Rangnummer */}
-                  <span className="text-gray-400 font-bold text-sm w-8">#{player.rank}</span>
+                  <span className="text-gray-400 font-bold text-sm w-8">
+                    #{player.rank}
+                  </span>
 
                   {/* Avatar */}
                   <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center shrink-0">
@@ -380,7 +451,9 @@ const FantasyTeam = () => {
             <div className="border-t border-gray-700 pt-4">
               <div className="flex items-center gap-3 p-3 rounded-lg bg-[#0c0c0c]">
                 {/* Rangnummer */}
-                <span className="text-gray-400 font-bold text-sm w-8">#{userRank.rank}</span>
+                <span className="text-gray-400 font-bold text-sm w-8">
+                  #{userRank.rank}
+                </span>
 
                 {/* Avatar */}
                 <div className="w-10 h-10 rounded-full bg-[#2b5eff] flex items-center justify-center shrink-0">
@@ -401,7 +474,9 @@ const FantasyTeam = () => {
                 </div>
 
                 {/* Username */}
-                <span className="text-white text-sm font-medium flex-1">{userRank.username}</span>
+                <span className="text-white text-sm font-medium flex-1">
+                  {userRank.username}
+                </span>
 
                 {/* XP badge */}
                 <span className="bg-gray-700 text-gray-300 text-xs px-3 py-1 rounded-full">
@@ -439,7 +514,7 @@ const FantasyTeam = () => {
             className="fixed inset-0 bg-black/50 z-30"
             onClick={() => setIsPlayerModalOpen(false)}
           />
-          
+
           {/* Modal */}
           <div className="fixed right-0 top-0 bottom-0 w-[500px] bg-[#1a1a1a] z-40 shadow-2xl overflow-y-auto transform transition-transform duration-300 ease-out">
             {/* Header */}
@@ -467,7 +542,7 @@ const FantasyTeam = () => {
                     />
                   </svg>
                 </button>
-                
+
                 {/* Filter icon */}
                 <button
                   type="button"
@@ -489,7 +564,7 @@ const FantasyTeam = () => {
                     />
                   </svg>
                 </button>
-                
+
                 {/* Close button */}
                 <button
                   type="button"
@@ -521,7 +596,9 @@ const FantasyTeam = () => {
                 <div
                   key={index}
                   className={`bg-[#0c0c0c] rounded-lg p-4 flex items-center gap-4 border-b-2 ${
-                    player.teamColor === "orange" ? "border-[#f68b32]" : "border-[#fbbf24]"
+                    player.teamColor === "orange"
+                      ? "border-[#f68b32]"
+                      : "border-[#fbbf24]"
                   }`}
                 >
                   {/* Speler afbeelding */}
@@ -544,16 +621,24 @@ const FantasyTeam = () => {
 
                   {/* Speler info */}
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-white font-bold text-lg mb-1">{player.name}</h3>
+                    <h3 className="text-white font-bold text-lg mb-1">
+                      {player.name}
+                    </h3>
                     <div className="flex items-center gap-2">
                       {/* Team logo */}
-                      <div className="w-4 h-4 rounded flex items-center justify-center shrink-0 overflow-hidden">
-                        <img
-                          src={player.team === "PAPANEUS" ? "/images/papaneus.png" : "/images/morrog.png"}
+                      <div className="w-4 h-4 rounded flex items-center justify-center shrink-0 overflow-hidden relative">
+                        <Image
+                          src={
+                            player.team === "PAPANEUS"
+                              ? "/images/papaneus.png"
+                              : "/images/morrog.png"
+                          }
                           alt={player.team}
-                          className="w-full h-full object-contain"
+                          fill
+                          className="object-contain"
                         />
                       </div>
+
                       <span
                         className={`text-sm font-medium ${
                           player.teamColor === "orange"
@@ -567,7 +652,9 @@ const FantasyTeam = () => {
                   </div>
 
                   {/* Waarde */}
-                  <div className="text-white font-semibold mr-4">{player.value}</div>
+                  <div className="text-white font-semibold mr-4">
+                    {player.value}
+                  </div>
 
                   {/* Actie button */}
                   <button

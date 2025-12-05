@@ -4,20 +4,10 @@ import React, { useState, useEffect, useMemo } from "react";
 import BekijkButton from "../ui/BekijkButton";
 
 import { Bracket } from "@/app/wedstrijden/MatchesList";
-
-interface Match {
-  id: number;
-  match_date: string;
-  status: string;
-  score_team1: number | null;
-  score_team2: number | null;
-  tournament: { name: string } | null;
-  team1: { name: string; logo_url: string } | null;
-  team2: { name: string; logo_url: string } | null;
-}
+import type { MatchListItem } from "@/app/api/matches/route";
 
 export default function BracketView() {
-  const [matches, setMatches] = useState<Match[]>([]);
+  const [matches, setMatches] = useState<MatchListItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -39,8 +29,8 @@ export default function BracketView() {
 
   const bracketMatches = useMemo(() => {
     const sorted = [...matches].sort((a, b) => {
-      const dateA = new Date(a.match_date).getTime();
-      const dateB = new Date(b.match_date).getTime();
+      const dateA = new Date(a.match_date || "").getTime();
+      const dateB = new Date(b.match_date || "").getTime();
       return dateA - dateB;
     });
 

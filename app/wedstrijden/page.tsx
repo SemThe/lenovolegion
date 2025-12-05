@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import BackgroundLines from "@/components/layout/BackgroundLines";
+import Image from "next/image";
 
 interface Match {
   id: number;
@@ -69,11 +70,13 @@ export default function WedstrijdenPage() {
             <header className="px-6 pt-6 pb-2 space-y-5">
               <div className="flex flex-wrap items-center gap-3">
                 {/* Logo */}
-                <div className="w-12 h-12 flex items-center justify-center">
-                  <img
+                <div className="flex items-center justify-center">
+                  <Image
                     src="/images/csgo-logo.png"
                     alt="Legion"
                     className="rounded-[5px]"
+                    width={48}
+                    height={48}
                   />
                 </div>
 
@@ -184,10 +187,12 @@ export default function WedstrijdenPage() {
                         {/* Team 1 */}
                         <div className="flex items-center gap-3 flex-1 min-w-0">
                           {match.team1?.logo_url && (
-                            <img
+                            <Image
                               src={match.team1.logo_url}
                               alt={match.team1?.name}
-                              className="w-12 h-12 object-cover"
+                              width={48}
+                              height={48}
+                              className="object-cover"
                             />
                           )}
 
@@ -214,10 +219,12 @@ export default function WedstrijdenPage() {
                           </span>
 
                           {match.team2?.logo_url && (
-                            <img
+                            <Image
                               src={match.team2.logo_url}
                               alt={match.team2?.name}
-                              className="w-12 h-12 object-cover"
+                              width={48}
+                              height={48}
+                              className="object-cover"
                             />
                           )}
                         </div>
