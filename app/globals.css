@@ -25,3 +25,20 @@
   --color-orange: #fd822a;
   --color-lgrey: #c0c0c0;
 }
+
+/* Fantasy Team Scroll */
+.fantasy-team-container {
+  overflow-y: auto;
+  overflow-x: auto;
+}
+
+/* Horizontale scroll alleen wanneer viewport smaller is dan 1400px */
+@media (max-width: 1399px) {
+  .fantasy-team-content {
+    min-width: 1400px;
+  }
+  
+  .fantasy-team-budget {
+    min-width: 1400px;
+  }
+}

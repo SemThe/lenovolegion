@@ -146,7 +146,25 @@ const FantasyTeam = () => {
 
   // Functie om speler toe te voegen aan My Squad of Subs
   const handleAddPlayer = (player: AvailablePlayer) => {
-    if (!selectedSlot) return;
+    // Als er geen selectedSlot is, probeer automatisch een leeg vakje te vinden
+    let currentSlot = selectedSlot;
+    
+    if (!currentSlot) {
+      // Vind eerste lege vakje in My Squad
+      const firstEmptyMySquad = mySquadPlayers.findIndex((p) => p === null);
+      if (firstEmptyMySquad !== -1) {
+        currentSlot = { team: "MySquad" as const, index: firstEmptyMySquad };
+      } else {
+        // Vind eerste lege vakje in Subs
+        const firstEmptySubs = subsPlayers.findIndex((p) => p === null);
+        if (firstEmptySubs !== -1) {
+          currentSlot = { team: "Subs" as const, index: firstEmptySubs };
+        } else {
+          alert("Geen lege vakjes meer beschikbaar!");
+          return;
+        }
+      }
+    }
     
     // Check of speler al gebruikt wordt
     if (isPlayerAlreadyUsed(player.name)) {
@@ -160,23 +178,50 @@ const FantasyTeam = () => {
       return;
     }
 
-    if (selectedSlot.team === "MySquad") {
+    if (currentSlot.team === "MySquad") {
       setMySquadPlayers((prev) => {
         const newPlayers = [...prev];
-        newPlayers[selectedSlot.index] = { ...player, isSelected: true };
+        newPlayers[currentSlot!.index] = { ...player, isSelected: true };
+        
+        // Vind het volgende lege vakje in My Squad na de update
+        const nextEmptyIndex = newPlayers.findIndex((p, idx) => idx > currentSlot!.index && p === null);
+        if (nextEmptyIndex !== -1) {
+          // Er is nog een leeg vakje, selecteer deze
+          setTimeout(() => setSelectedSlot({ team: "MySquad", index: nextEmptyIndex }), 0);
+        } else {
+          // Geen lege vakjes meer in My Squad, check Subs
+          const firstEmptySubs = subsPlayers.findIndex((p) => p === null);
+          if (firstEmptySubs !== -1) {
+            setTimeout(() => setSelectedSlot({ team: "Subs", index: firstEmptySubs }), 0);
+          } else {
+            // Geen lege vakjes meer, reset selectedSlot maar laat modal open
+            setTimeout(() => setSelectedSlot(null), 0);
+          }
+        }
+        
         return newPlayers;
       });
     } else {
       setSubsPlayers((prev) => {
         const newPlayers = [...prev];
-        newPlayers[selectedSlot.index] = { ...player, isSelected: true };
+        newPlayers[currentSlot!.index] = { ...player, isSelected: true };
+        
+        // Vind het volgende lege vakje in Subs na de update
+        const nextEmptyIndex = newPlayers.findIndex((p, idx) => idx > currentSlot!.index && p === null);
+        if (nextEmptyIndex !== -1) {
+          // Er is nog een leeg vakje in Subs, selecteer deze
+          setTimeout(() => setSelectedSlot({ team: "Subs", index: nextEmptyIndex }), 0);
+        } else {
+          // Geen lege vakjes meer, reset selectedSlot maar laat modal open
+          setTimeout(() => setSelectedSlot(null), 0);
+        }
+        
         return newPlayers;
       });
     }
 
     setHasUnsavedChanges(true);
-    setIsPlayerModalOpen(false);
-    setSelectedSlot(null);
+    // Modal blijft open - niet sluiten
   };
 
   // Functie om speler te verwijderen
@@ -221,7 +266,7 @@ const FantasyTeam = () => {
   const userRank = { rank: 150, username: "Jij", xp: "80 XP", avatar: null };
 
   return (
-    <div className="relative h-screen bg-[#0b0b0b] overflow-hidden">
+    <div className="relative min-h-screen bg-[#0b0b0b] overflow-x-hidden">
       {/* Achtergrond met V-vormige lichtbundels */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <Achtergrond />
@@ -229,18 +274,18 @@ const FantasyTeam = () => {
 
       <div className="relative z-10">
         {/* Hoofdcontent */}
-        <div className="w-full px-6 pt-24 pb-24 flex flex-row gap-8 overflow-visible">
+        <div className="w-full max-w-[1400px] mx-auto px-2 sm:px-3 md:px-4 lg:px-6 pt-16 sm:pt-20 md:pt-24 pb-20 sm:pb-24 md:pb-28 flex flex-col lg:flex-row gap-3 sm:gap-4 lg:gap-6">
           {/* Linkerzijde - Fantasyteam sectie */}
-          <div className="flex-1 overflow-visible relative z-10">
+          <div className="flex-1 overflow-visible relative z-10 min-w-0">
             {/* Titel Banner */}
-            <div className="rounded-lg px-6 py-4 mb-6 flex items-center gap-3">
+            <div className="rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 mb-2 sm:mb-3 flex items-center gap-2 sm:gap-3">
               {/* Linkerzijde - Tekst */}
               <div className="flex flex-col">
-                <h1 className="text-white font-bold text-lg leading-tight">Lenovo</h1>
-                <h1 className="text-white font-bold text-lg leading-tight">Fantasyteam</h1>
+                <h1 className="text-white font-bold text-base sm:text-lg leading-tight">Lenovo</h1>
+                <h1 className="text-white font-bold text-base sm:text-lg leading-tight">Fantasyteam</h1>
               </div>
               {/* Rechterzijde - CS:GO Logo */}
-              <div className="w-15 h-15 rounded-lg overflow-hidden">
+              <div className="w-12 h-12 sm:w-15 sm:h-15 rounded-lg overflow-hidden shrink-0">
                 <img
                   src="/images/csgo.png"
                   alt="CS:GO Logo"
@@ -250,25 +295,25 @@ const FantasyTeam = () => {
             </div>
 
             {/* My Squad sectie */}
-            <div className="mb-6 relative">
-              <div className="flex items-center gap-4 mb-3">
-                <h2 className="text-base font-bold text-white ml-6 w-20">My Squad</h2>
+            <div className="mb-2 sm:mb-3 relative">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3 mb-1.5 sm:mb-2">
+                <h2 className="text-sm sm:text-base font-bold text-white ml-0 sm:ml-2 shrink-0">My Squad</h2>
                 {/* Puntentelling knop */}
                 <button
                   type="button"
                   onClick={() => setIsPuntentellingModalOpen(true)}
-                  className="bg-[#2b5eff] hover:bg-[#1e4fe6] text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors ml-265 relative z-30"
+                  className="bg-[#2b5eff] hover:bg-[#1e4fe6] text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-colors shrink-0"
                 >
                   Puntentelling
                 </button>
               </div>
-              <div className="flex gap-4 flex-wrap justify-center overflow-visible relative">
+              <div className="flex gap-1.5 sm:gap-2 md:gap-2.5 lg:gap-3 flex-wrap justify-center overflow-visible relative">
                 {/* My Squad spelerkaarten */}
                 {mySquadPlayers.map((player, index) => (
                   player ? (
                     <div
                       key={index}
-                      className="w-48 h-48 rounded-2xl overflow-hidden shadow-lg relative border-2 border-[#f68b32] bg-[#1a1a1a] flex flex-col z-10"
+                      className="w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 lg:w-40 lg:h-40 xl:w-44 xl:h-44 rounded-xl sm:rounded-2xl overflow-hidden shadow-lg relative border-2 border-[#f68b32] bg-[#1a1a1a] flex flex-col z-10 shrink-0"
                     >
                       {/* Prullenbak icoon rechtsboven */}
                       <button
@@ -294,7 +339,7 @@ const FantasyTeam = () => {
                       </button>
 
                       {/* Team logo in hoek */}
-                      <div className="absolute top-2 left-2 w-12 h-12 rounded flex items-center justify-center z-10 overflow-hidden">
+                      <div className="absolute top-1.5 left-1.5 sm:top-2 sm:left-2 w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 rounded flex items-center justify-center z-10 overflow-hidden">
                         <img
                           src={player.team === "PAPANEUS" ? "/images/papaneus.png" : "/images/morrog.png"}
                           alt={player.team}
@@ -303,7 +348,7 @@ const FantasyTeam = () => {
                       </div>
 
                       {/* Speler afbeelding */}
-                      <div className="w-full h-32 bg-gray-800 flex items-center justify-center shrink-0 overflow-hidden">
+                      <div className="w-full h-16 sm:h-20 md:h-24 lg:h-28 bg-gray-800 flex items-center justify-center shrink-0 overflow-hidden">
                         {player.image ? (
                           <img
                             src={player.image}
@@ -313,7 +358,7 @@ const FantasyTeam = () => {
                         ) : (
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            className="h-20 w-20 text-gray-600"
+                            className="h-16 w-16 sm:h-18 sm:w-18 lg:h-20 lg:w-20 text-gray-600"
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
@@ -329,8 +374,8 @@ const FantasyTeam = () => {
                       </div>
 
                       {/* Naamtag op donkere balk */}
-                      <div className="bg-[#1a1a1a] px-1 py-2 flex flex-col justify-center shrink -mt-2">
-                        <h3 className="text-white font-semibold text-sm text-center pt-0">
+                      <div className="bg-[#1a1a1a] px-1 py-1.5 sm:py-2 flex flex-col justify-center shrink -mt-2">
+                        <h3 className="text-white font-semibold text-xs sm:text-sm text-center pt-0">
                           {player.name}
                         </h3>
                         {/* Lijn met fade */}
@@ -344,7 +389,7 @@ const FantasyTeam = () => {
                   ) : (
                     <div
                       key={index}
-                      className="w-48 h-48 rounded-2xl border-2 border-dashed border-[#f68b32] bg-[#f68b32]/10 flex items-center justify-center shadow-lg cursor-pointer hover:bg-[#f68b32]/20 transition-colors relative z-10"
+                            className="w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 lg:w-40 lg:h-40 xl:w-44 xl:h-44 rounded-xl sm:rounded-2xl border-2 border-dashed border-[#f68b32] bg-[#f68b32]/10 flex items-center justify-center shadow-lg cursor-pointer hover:bg-[#f68b32]/20 transition-colors relative z-10 shrink-0"
                       onClick={() => handleOpenPlayerModal("MySquad", index)}
                     >
                       <svg
@@ -373,14 +418,14 @@ const FantasyTeam = () => {
             </div>
 
             {/* Subs sectie */}
-            <div className="mb-6">
-              <h2 className="text-base font-bold text-white mb-3 ml-6">Subs</h2>
-              <div className="flex gap-4 items-center justify-center overflow-visible">
+            <div className="mb-2 sm:mb-3">
+              <h2 className="text-sm sm:text-base font-bold text-white mb-1.5 sm:mb-2 ml-0 sm:ml-2">Subs</h2>
+              <div className="flex gap-1.5 sm:gap-2 md:gap-2.5 lg:gap-3 items-center justify-center overflow-visible flex-wrap">
                 {subsPlayers.map((player, index) => (
                   player ? (
                     <div
                       key={index}
-                      className="w-48 h-48 rounded-2xl overflow-hidden shadow-lg relative border-2 border-[#2b5eff] bg-[#1a1a1a] flex flex-col"
+                      className="w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 lg:w-40 lg:h-40 xl:w-44 xl:h-44 rounded-xl sm:rounded-2xl overflow-hidden shadow-lg relative border-2 border-[#2b5eff] bg-[#1a1a1a] flex flex-col shrink-0"
                     >
                       {/* Prullenbak icoon rechtsboven */}
                       <button
@@ -406,7 +451,7 @@ const FantasyTeam = () => {
                       </button>
 
                       {/* Team logo in hoek */}
-                      <div className="absolute top-2 left-2 w-12 h-12 rounded flex items-center justify-center z-10 overflow-hidden">
+                      <div className="absolute top-1.5 left-1.5 sm:top-2 sm:left-2 w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 lg:w-10 lg:h-10 rounded flex items-center justify-center z-10 overflow-hidden">
                         <img
                           src={player.team === "PAPANEUS" ? "/images/papaneus.png" : "/images/morrog.png"}
                           alt={player.team}
@@ -415,7 +460,7 @@ const FantasyTeam = () => {
                       </div>
 
                       {/* Speler afbeelding */}
-                      <div className="w-full h-32 bg-gray-800 flex items-center justify-center shrink-0 overflow-hidden">
+                      <div className="w-full h-16 sm:h-20 md:h-24 lg:h-28 bg-gray-800 flex items-center justify-center shrink-0 overflow-hidden">
                         {player.image ? (
                           <img
                             src={player.image}
@@ -425,7 +470,7 @@ const FantasyTeam = () => {
                         ) : (
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            className="h-20 w-20 text-gray-600"
+                            className="h-16 w-16 sm:h-18 sm:w-18 lg:h-20 lg:w-20 text-gray-600"
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
@@ -441,22 +486,22 @@ const FantasyTeam = () => {
                       </div>
 
                       {/* Naamtag op donkere balk */}
-                      <div className="bg-[#1a1a1a] px-3 py-0 flex flex-col justify-center shrink-0">
-                        <h3 className="text-white font-semibold text-sm text-center pt-1">
+                      <div className="bg-[#1a1a1a] px-2 sm:px-3 py-0 flex flex-col justify-center shrink-0">
+                        <h3 className="text-white font-semibold text-xs sm:text-sm text-center pt-1">
                           {player.name}
                         </h3>
                         {/* Lijn met fade */}
                         <div className="w-full h-px bg-linear-to-r from-transparent via-gray-600 to-transparent my-0.5"></div>
                         {/* Waarde */}
                         <div className="text-center pb-1">
-                          <span className="text-gray-300 text-xs">{player.value}</span>
+                          <span className="text-gray-300 text-[10px] sm:text-xs">{player.value}</span>
                         </div>
                       </div>
                     </div>
                   ) : (
                     <div
                       key={index}
-                      className="w-48 h-48 rounded-2xl border-2 border-dashed border-[#2b5eff] bg-[#2b5eff]/10 flex items-center justify-center shadow-lg cursor-pointer hover:bg-[#2b5eff]/20 transition-colors"
+                      className="w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 lg:w-40 lg:h-40 xl:w-44 xl:h-44 rounded-xl sm:rounded-2xl border-2 border-dashed border-[#2b5eff] bg-[#2b5eff]/10 flex items-center justify-center shadow-lg cursor-pointer hover:bg-[#2b5eff]/20 transition-colors shrink-0"
                       onClick={() => handleOpenPlayerModal("Subs", index)}
                     >
                       <svg
@@ -481,10 +526,10 @@ const FantasyTeam = () => {
           </div>
 
           {/* Rechterzijpaneel - Top 10 */}
-          <div className="w-[353px] bg-[#1a1a1a] rounded-2xl p-[21px] shadow-lg mt-4 shrink-0 relative z-0 h-[calc(100vh-8rem)] flex flex-col">
-            <h2 className="text-base font-bold text-white mb-[17px]">Top 10</h2>
+          <div className="w-full lg:w-[280px] xl:w-[320px] 2xl:w-[353px] bg-[#1a1a1a] rounded-2xl p-2.5 sm:p-3 lg:p-4 shadow-lg mt-2 lg:mt-2 shrink-0 relative z-0 h-auto lg:h-[calc(100vh-16rem)] flex flex-col">
+            <h2 className="text-base font-bold text-white mb-3 sm:mb-4">Top 10</h2>
 
-            <div className="space-y-[11px] mb-4 flex-1 overflow-y-auto">
+            <div className="space-y-2 sm:space-y-2.5 mb-3 flex-1 overflow-y-auto">
               {top10.map((player) => (
                 <div
                   key={player.rank}
@@ -525,7 +570,7 @@ const FantasyTeam = () => {
             </div>
 
           
-            <div className="border-t border-gray-700 pt-[17px]">
+            <div className="border-t border-gray-700 pt-3 sm:pt-4">
               <div className="flex items-center gap-[13px] p-[9px] rounded-lg bg-[#0c0c0c]">
               
                 <span className="text-gray-400 font-bold text-xs w-7">#{userRank.rank}</span>
@@ -561,12 +606,12 @@ const FantasyTeam = () => {
         </div>
 
         {/* Budget en Opslaan - Fixed onderaan */}
-        <div className="fixed bottom-0 left-0 z-20 bg-[#0c0c0c]">
-          <div className="px-6 py-4">
-            <div className="flex items-center justify-between bg-[#1a1a1a] rounded-xl px-6 py-4" style={{ width: 'calc((120.5vw - 3rem) * 0.65)' }}>
-              <div className="flex items-center gap-2">
-                <span className="text-white font-semibold">Budget:</span>
-                <span className={`font-bold text-lg ${remainingBudget < 0 ? "text-red-500" : "text-[#2b5eff]"}`}>
+        <div className="fixed bottom-0 left-0 right-0 z-20 bg-[#0c0c0c] border-t border-gray-800">
+          <div className="w-full max-w-[1400px] mx-auto px-2 sm:px-3 md:px-4 lg:px-6 py-2 sm:py-2.5 md:py-3">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3 md:gap-4 bg-[#1a1a1a] rounded-lg sm:rounded-xl px-2 sm:px-2.5 md:px-3 lg:px-4 py-2 sm:py-2.5 md:py-3">
+              <div className="flex items-center gap-2 shrink-0">
+                <span className="text-white text-xs sm:text-sm md:text-base font-semibold">Budget:</span>
+                <span className={`font-bold text-sm sm:text-base md:text-lg ${remainingBudget < 0 ? "text-red-500" : "text-[#2b5eff]"}`}>
                   {formatPrice(remainingBudget)}
                 </span>
               </div>
@@ -577,7 +622,7 @@ const FantasyTeam = () => {
                   hasUnsavedChanges
                     ? "bg-[#2b5eff] hover:bg-[#1e4fe6]"
                     : "bg-[#1e3a8a] hover:bg-[#1e3a8a]"
-                } text-white px-8 py-3 rounded-lg font-bold transition-colors`}
+                } text-white px-4 sm:px-6 md:px-8 py-1.5 sm:py-2 md:py-3 rounded-lg text-xs sm:text-sm md:text-base font-bold transition-colors w-full sm:w-auto shrink-0`}
               >
                 Opslaan
               </button>
@@ -599,7 +644,7 @@ const FantasyTeam = () => {
           />
 
           {/* Modal */}
-          <div className="fixed right-0 top-0 bottom-0 w-[500px] bg-[#1a1a1a] z-40 shadow-2xl overflow-y-auto transform transition-transform duration-300 ease-out">
+          <div className="fixed right-0 top-0 bottom-0 w-full sm:w-[450px] lg:w-[500px] bg-[#1a1a1a] z-40 shadow-2xl overflow-y-auto transform transition-transform duration-300 ease-out">
             {/* Header */}
             <div className="sticky top-0 bg-[#1a1a1a] border-b border-gray-800 px-6 py-4 flex items-center justify-between">
               <h2 className="text-xl font-bold text-white">Spelers</h2>
@@ -757,29 +802,19 @@ const FantasyTeam = () => {
                   {/* Actie button */}
                   <button
                     type="button"
-                    className="text-white hover:text-gray-400 transition-colors shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
                     onClick={() => {
                       if (selectedSlot) {
                         handleAddPlayer(player);
                       }
                     }}
                     disabled={!selectedSlot || remainingBudget < parsePrice(player.value) || isPlayerAlreadyUsed(player.name)}
-                    aria-label="Toevoegen"
+                    className={`bg-[#2b5eff] hover:bg-[#1e4fe6] text-white px-4 py-2 rounded-lg font-semibold transition-colors shrink-0 ${
+                      !selectedSlot || remainingBudget < parsePrice(player.value) || isPlayerAlreadyUsed(player.name)
+                        ? "opacity-50 cursor-not-allowed"
+                        : ""
+                    }`}
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-6 w-6"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 4v16m8-8H4"
-                      />
-                    </svg>
+                    Toevoegen
                   </button>
                 </div>
                 );
@@ -791,8 +826,8 @@ const FantasyTeam = () => {
 
       {/* Puntentelling Modal */}
       {isPuntentellingModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-[#1a1a1a] rounded-lg w-full max-w-2xl mx-4 overflow-hidden shadow-2xl relative h-[600px] flex flex-col">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-[#1a1a1a] rounded-lg w-full max-w-2xl mx-auto overflow-hidden shadow-2xl relative h-[90vh] sm:h-[600px] flex flex-col">
             {/* Close button */}
             <button
               type="button"
