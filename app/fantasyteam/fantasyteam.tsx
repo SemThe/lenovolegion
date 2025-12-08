@@ -15,7 +15,9 @@ type AvailablePlayer = {
 
 const FantasyTeam = () => {
   const [isPlayerModalOpen, setIsPlayerModalOpen] = useState(false);
+  const [isPuntentellingModalOpen, setIsPuntentellingModalOpen] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState<{ team: "MySquad" | "Subs"; index: number } | null>(null);
+  const [activeTab, setActiveTab] = useState<"team" | "individual">("team");
   
   // State voor geselecteerde spelers
   const [mySquadPlayers, setMySquadPlayers] = useState<(AvailablePlayer | null)[]>([
@@ -127,14 +129,28 @@ const FantasyTeam = () => {
     { name: "NAF", value: "2K", team: "PAPANEUS", teamColor: "orange", isSelected: false },
     { name: "SIUHY", value: "2.5K", team: "PAPANEUS", teamColor: "orange", isSelected: false },
     { name: "MEZII", value: "3K", team: "MORROG", teamColor: "yellow", isSelected: false },
-    { name: "ZTWOO", value: "1K", team: "MORROG", teamColor: "yellow", isSelected: false },
+    { name: "ZYWOO", value: "1K", team: "MORROG", teamColor: "yellow", isSelected: false },
     { name: "ROPZ", value: "2K", team: "MORROG", teamColor: "yellow", isSelected: false },
   ]);
 
 
+  // Functie om te checken of een speler al gebruikt wordt
+  const isPlayerAlreadyUsed = (playerName: string): boolean => {
+    return (
+      mySquadPlayers.some((p) => p?.name === playerName) ||
+      subsPlayers.some((p) => p?.name === playerName)
+    );
+  };
+
   // Functie om speler toe te voegen aan My Squad of Subs
   const handleAddPlayer = (player: AvailablePlayer) => {
     if (!selectedSlot) return;
+    
+    // Check of speler al gebruikt wordt
+    if (isPlayerAlreadyUsed(player.name)) {
+      alert("Deze speler is al geselecteerd!");
+      return;
+    }
     
     const playerPrice = parsePrice(player.value);
     if (remainingBudget < playerPrice) {
@@ -208,7 +224,7 @@ const FantasyTeam = () => {
 
       <div className="relative z-10">
         {/* Hoofdcontent */}
-        <div className="w-full px-6 pt-24 pb-24 flex gap-8 overflow-visible">
+        <div className="w-full px-6 pt-24 pb-24 flex flex-row gap-8 overflow-visible">
           {/* Linkerzijde - Fantasyteam sectie */}
           <div className="flex-1 overflow-visible">
             {/* Titel Banner */}
@@ -219,7 +235,7 @@ const FantasyTeam = () => {
                 <h1 className="text-white font-bold text-lg leading-tight">Fantasyteam</h1>
               </div>
               {/* Rechterzijde - CS:GO Logo */}
-              <div className="w-15 h-15 rounded-lg overflow-hidden ">
+              <div className="w-15 h-15 rounded-lg overflow-hidden">
                 <img
                   src="/images/csgo.png"
                   alt="CS:GO Logo"
@@ -235,6 +251,7 @@ const FantasyTeam = () => {
                 {/* Puntentelling knop */}
                 <button
                   type="button"
+                  onClick={() => setIsPuntentellingModalOpen(true)}
                   className="bg-[#2b5eff] hover:bg-[#1e4fe6] text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors ml-265"
                 >
                   Puntentelling
@@ -299,14 +316,14 @@ const FantasyTeam = () => {
                       </div>
 
                       {/* Naamtag op donkere balk */}
-                      <div className="bg-[#1a1a1a] px-1 py-4 flex flex-col justify-center shrink">
-                        <h3 className="text-white font-semibold text-sm text-center pt-1">
+                      <div className="bg-[#1a1a1a] px-1 py-2 flex flex-col justify-center shrink -mt-2">
+                        <h3 className="text-white font-semibold text-sm text-center pt-0">
                           {player.name}
                         </h3>
                         {/* Lijn met fade */}
                         <div className="w-full h-px bg-linear-to-r from-transparent via-gray-600 to-transparent my-0.5"></div>
                         {/* Waarde */}
-                        <div className="text-center pb-1">
+                        <div className="text-center pb-0">
                           <span className="text-gray-300 text-xs">{player.value}</span>
                         </div>
                       </div>
@@ -403,27 +420,27 @@ const FantasyTeam = () => {
                       </div>
 
                       {/* Naamtag op donkere balk */}
-                      <div className="bg-[#1a1a1a] px-3 py-0 flex flex-col justify-center shrink-0">
-                        <h3 className="text-white font-semibold text-sm text-center pt-1">
+                      <div className="bg-[#1a1a1a] px-2 sm:px-3 py-0 flex flex-col justify-center shrink-0">
+                        <h3 className="text-white font-semibold text-xs sm:text-sm text-center pt-1">
                           {player.name}
                         </h3>
                         {/* Lijn met fade */}
                         <div className="w-full h-px bg-linear-to-r from-transparent via-gray-600 to-transparent my-0.5"></div>
                         {/* Waarde */}
                         <div className="text-center pb-1">
-                          <span className="text-gray-300 text-xs">{player.value}</span>
+                          <span className="text-gray-300 text-[10px] sm:text-xs">{player.value}</span>
                         </div>
                       </div>
                     </div>
                   ) : (
                     <div
                       key={index}
-                      className="w-48 h-48 rounded-2xl border-2 border-dashed border-[#2b5eff] bg-[#2b5eff]/10 flex items-center justify-center shadow-lg cursor-pointer hover:bg-[#2b5eff]/20 transition-colors"
+                      className="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 rounded-xl sm:rounded-2xl border-2 border-dashed border-[#2b5eff] bg-[#2b5eff]/10 flex items-center justify-center shadow-lg cursor-pointer hover:bg-[#2b5eff]/20 transition-colors"
                       onClick={() => handleOpenPlayerModal("Subs", index)}
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        className="h-12 w-12 text-gray-400"
+                        className="h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 text-gray-400"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -635,11 +652,15 @@ const FantasyTeam = () => {
 
             {/* Spelerlijst */}
             <div className="p-4 space-y-2">
-              {availablePlayers.map((player, index) => (
+              {availablePlayers.map((player, index) => {
+                const isUsed = isPlayerAlreadyUsed(player.name);
+                return (
                 <div
                   key={index}
                   className={`bg-[#0c0c0c] rounded-lg p-4 flex items-center gap-4 border-b-2 ${
-                    player.teamColor === "orange"
+                    isUsed 
+                      ? "opacity-50 border-gray-600"
+                      : player.teamColor === "orange"
                       ? "border-[#f68b32]"
                       : "border-[#fbbf24]"
                   }`}
@@ -708,7 +729,7 @@ const FantasyTeam = () => {
                         handleAddPlayer(player);
                       }
                     }}
-                    disabled={!selectedSlot || remainingBudget < parsePrice(player.value)}
+                    disabled={!selectedSlot || remainingBudget < parsePrice(player.value) || isPlayerAlreadyUsed(player.name)}
                     aria-label="Toevoegen"
                   >
                     <svg
@@ -727,10 +748,182 @@ const FantasyTeam = () => {
                     </svg>
                   </button>
                 </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </>
+      )}
+
+      {/* Puntentelling Modal */}
+      {isPuntentellingModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-[#1a1a1a] rounded-lg w-full max-w-2xl mx-4 overflow-hidden shadow-2xl relative">
+            {/* Close button */}
+            <button
+              type="button"
+              onClick={() => setIsPuntentellingModalOpen(false)}
+              className="absolute top-4 right-4 z-10 bg-black/70 hover:bg-black/90 rounded-full p-2 transition-colors"
+              aria-label="Sluiten"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 text-white"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+
+            {/* Counter-Strike 2 Image */}
+            <div className="w-full h-48 bg-gradient-to-r from-gray-800 via-orange-600 to-gray-800 relative overflow-hidden">
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="text-center">
+                  <h2 className="text-white text-2xl font-bold mb-2">COUNTER STRIKE 2</h2>
+                  <p className="text-white/80 text-sm">LIMITED TEST</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Tabs */}
+            <div className="flex border-b border-gray-700">
+              <button
+                type="button"
+                onClick={() => setActiveTab("team")}
+                className={`flex-1 py-4 px-6 text-white font-semibold transition-colors ${
+                  activeTab === "team"
+                    ? "bg-[#2b5eff]"
+                    : "bg-[#8b4513] hover:bg-[#a0522d]"
+                }`}
+              >
+                teamprestaties
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab("individual")}
+                className={`flex-1 py-4 px-6 text-white font-semibold transition-colors ${
+                  activeTab === "individual"
+                    ? "bg-[#2b5eff]"
+                    : "bg-[#8b4513] hover:bg-[#a0522d]"
+                }`}
+              >
+                individueleprestaties
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="p-6">
+              {activeTab === "team" ? (
+                <div className="grid grid-cols-3 gap-4">
+                  {/* Round Win Card */}
+                  <div className="bg-[#0c0c0c] rounded-lg p-4 border border-gray-700">
+                    <h3 className="text-white text-sm font-semibold mb-3">round win</h3>
+                    <button className="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded font-semibold transition-colors">
+                      +5 p
+                    </button>
+                  </div>
+
+                  {/* Game Win Card */}
+                  <div className="bg-[#0c0c0c] rounded-lg p-4 border border-gray-700">
+                    <h3 className="text-white text-sm font-semibold mb-3">game win</h3>
+                    <button className="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded font-semibold transition-colors">
+                      +10 p
+                    </button>
+                  </div>
+
+                  {/* Round Lose Card */}
+                  <div className="bg-[#0c0c0c] rounded-lg p-4 border border-gray-700">
+                    <h3 className="text-white text-sm font-semibold mb-3">round lose</h3>
+                    <button className="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded font-semibold transition-colors">
+                      -5 p
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {/* Kills */}
+                  <div className="bg-[#0c0c0c] rounded-lg p-4 border border-gray-700 flex items-center justify-between">
+                    <span className="text-white text-sm font-semibold">Kills</span>
+                    <button className="bg-green-600 hover:bg-green-700 text-white py-1 px-4 rounded font-semibold transition-colors">
+                      +2p
+                    </button>
+                  </div>
+
+                  {/* Deaths */}
+                  <div className="bg-[#0c0c0c] rounded-lg p-4 border border-gray-700 flex items-center justify-between">
+                    <span className="text-white text-sm font-semibold">Deaths</span>
+                    <button className="bg-red-600 hover:bg-red-700 text-white py-1 px-4 rounded font-semibold transition-colors">
+                      -2p
+                    </button>
+                  </div>
+
+                  {/* Assist */}
+                  <div className="bg-[#0c0c0c] rounded-lg p-4 border border-gray-700 flex items-center justify-between">
+                    <span className="text-white text-sm font-semibold">Assist</span>
+                    <button className="bg-green-600 hover:bg-green-700 text-white py-1 px-4 rounded font-semibold transition-colors">
+                      +3p
+                    </button>
+                  </div>
+
+                  {/* KAST <70% */}
+                  <div className="bg-[#0c0c0c] rounded-lg p-4 border border-gray-700 flex items-center justify-between">
+                    <span className="text-white text-sm font-semibold">KAST &lt;70%</span>
+                    <button className="bg-red-600 hover:bg-red-700 text-white py-1 px-4 rounded font-semibold transition-colors">
+                      -1p
+                    </button>
+                  </div>
+
+                  {/* KAST 70% - 80% */}
+                  <div className="bg-[#0c0c0c] rounded-lg p-4 border border-gray-700 flex items-center justify-between">
+                    <span className="text-white text-sm font-semibold">KAST 70% - 80%</span>
+                    <button className="bg-green-600 hover:bg-green-700 text-white py-1 px-4 rounded font-semibold transition-colors">
+                      +1p
+                    </button>
+                  </div>
+
+                  {/* KAST 80% - 90% */}
+                  <div className="bg-[#0c0c0c] rounded-lg p-4 border border-gray-700 flex items-center justify-between">
+                    <span className="text-white text-sm font-semibold">KAST 80% - 90%</span>
+                    <button className="bg-green-600 hover:bg-green-700 text-white py-1 px-4 rounded font-semibold transition-colors">
+                      +2p
+                    </button>
+                  </div>
+
+                  {/* KAST 90%> */}
+                  <div className="bg-[#0c0c0c] rounded-lg p-4 border border-gray-700 flex items-center justify-between">
+                    <span className="text-white text-sm font-semibold">KAST 90%&gt;</span>
+                    <button className="bg-green-600 hover:bg-green-700 text-white py-1 px-4 rounded font-semibold transition-colors">
+                      +3p
+                    </button>
+                  </div>
+
+                  {/* DMG 1500> */}
+                  <div className="bg-[#0c0c0c] rounded-lg p-4 border border-gray-700 flex items-center justify-between">
+                    <span className="text-white text-sm font-semibold">DMG 1500&gt;</span>
+                    <button className="bg-green-600 hover:bg-green-700 text-white py-1 px-4 rounded font-semibold transition-colors">
+                      +4p
+                    </button>
+                  </div>
+
+                  {/* MVP per ronde */}
+                  <div className="bg-[#0c0c0c] rounded-lg p-4 border border-gray-700 flex items-center justify-between">
+                    <span className="text-white text-sm font-semibold">MVP per ronde</span>
+                    <button className="bg-green-600 hover:bg-green-700 text-white py-1 px-4 rounded font-semibold transition-colors">
+                      +1p
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
