@@ -11,15 +11,6 @@ export default function PlayerCard() {
       <h2 className="absolute bottom-0 z-30 flex flex-row items-center justify-center p-4 bg-white/10 w-full font-semibold text-lgrey border-b-4 border-papaneus backdrop-blur-xl">
         Twistzz
       </h2>
-      <div className="absolute right-10 top-10 translate-1/2">
-        <Image
-          src="/images/papaneus.png"
-          alt="Papaneus-logo"
-          width={78}
-          height={78}
-          className="opacity-25"
-        />
-      </div>
 
       {/* Foto van speler */}
       <div className="absolute  bottom-0 z-10">
