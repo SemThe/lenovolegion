@@ -85,6 +85,8 @@ export default function BracketPage() {
                             )}
  
                     
+
+                            
                         </div>
                     </div>
                 </section>
