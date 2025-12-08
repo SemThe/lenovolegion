@@ -18,6 +18,7 @@ const FantasyTeam = () => {
   const [isPuntentellingModalOpen, setIsPuntentellingModalOpen] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState<{ team: "MySquad" | "Subs"; index: number } | null>(null);
   const [activeTab, setActiveTab] = useState<"team" | "individual">("team");
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   
   // State voor geselecteerde spelers
   const [mySquadPlayers, setMySquadPlayers] = useState<(AvailablePlayer | null)[]>([
@@ -83,9 +84,15 @@ const FantasyTeam = () => {
       };
       localStorage.setItem('fantasyTeam', JSON.stringify(teamData));
       console.log('Team opgeslagen in localStorage');
+      setHasUnsavedChanges(false);
     } catch (error) {
       console.error('Error saving team to localStorage:', error);
     }
+  };
+
+  // Functie om handmatig op te slaan (bij klik op Opslaan button)
+  const handleSaveClick = () => {
+    saveTeamToLocalStorage();
   };
 
   // Functie om team te laden uit localStorage
@@ -98,6 +105,7 @@ const FantasyTeam = () => {
         const teamData = JSON.parse(savedTeam);
         setMySquadPlayers(teamData.mySquad || [null, null, null, null, null]);
         setSubsPlayers(teamData.subs || [null, null]);
+        setHasUnsavedChanges(false);
         console.log('Team geladen uit localStorage');
       }
     } catch (error) {
@@ -110,27 +118,21 @@ const FantasyTeam = () => {
     loadTeamFromLocalStorage();
   }, []);
 
-  // Sla team automatisch op wanneer spelers worden toegevoegd/verwijderd (debounced)
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      saveTeamToLocalStorage();
-    }, 500); // Debounce: save 0.5 second after last change
-
-    return () => clearTimeout(timer);
-  }, [mySquadPlayers, subsPlayers]);
+  // Markeer als er wijzigingen zijn wanneer spelers worden toegevoegd/verwijderd
+  // Auto-save is uitgeschakeld - alleen handmatig opslaan via de button
 
 
   // Beschikbare spelers voor selectie
   const [availablePlayers, setAvailablePlayers] = useState<AvailablePlayer[]>([
-    { name: "TWISTZZ", value: "3K", team: "PAPANEUS", teamColor: "orange", isSelected: false },
-    { name: "FLAMEZ", value: "3.5K", team: "MORROG", teamColor: "yellow", isSelected: false },
-    { name: "ULTIMATE", value: "2K", team: "PAPANEUS", teamColor: "orange", isSelected: false },
-    { name: "NERTZ", value: "2.5K", team: "PAPANEUS", teamColor: "orange", isSelected: false },
-    { name: "NAF", value: "2K", team: "PAPANEUS", teamColor: "orange", isSelected: false },
-    { name: "SIUHY", value: "2.5K", team: "PAPANEUS", teamColor: "orange", isSelected: false },
-    { name: "MEZII", value: "3K", team: "MORROG", teamColor: "yellow", isSelected: false },
-    { name: "ZYWOO", value: "1K", team: "MORROG", teamColor: "yellow", isSelected: false },
-    { name: "ROPZ", value: "2K", team: "MORROG", teamColor: "yellow", isSelected: false },
+    { name: "TWISTZZ", value: "3K", team: "PAPANEUS", teamColor: "orange", image: "/images/twistzz.png", isSelected: false },
+    { name: "FLAMEZ", value: "3.5K", team: "MORROG", teamColor: "yellow", image: "/images/Flamez.png", isSelected: false },
+    { name: "ULTIMATE", value: "2K", team: "PAPANEUS", teamColor: "orange", image: "/images/Ultimate.png", isSelected: false },
+    { name: "NERTZ", value: "2.5K", team: "PAPANEUS", teamColor: "orange", image: "/images/Nertz.png", isSelected: false },
+    { name: "NAF", value: "2K", team: "PAPANEUS", teamColor: "orange", image: "/images/Naf.png", isSelected: false },
+    { name: "SIUHY", value: "2.5K", team: "PAPANEUS", teamColor: "orange", image: "/images/Siuhy.png", isSelected: false },
+    { name: "MEZII", value: "3K", team: "MORROG", teamColor: "yellow", image: "/images/Mezzi.png", isSelected: false },
+    { name: "ZYWOO", value: "1K", team: "MORROG", teamColor: "yellow", image: "/images/Zywoo.png", isSelected: false },
+    { name: "ROPZ", value: "2K", team: "MORROG", teamColor: "yellow", image: "/images/Ropz.png", isSelected: false },
   ]);
 
 
@@ -172,6 +174,7 @@ const FantasyTeam = () => {
       });
     }
 
+    setHasUnsavedChanges(true);
     setIsPlayerModalOpen(false);
     setSelectedSlot(null);
   };
@@ -191,7 +194,9 @@ const FantasyTeam = () => {
         return newPlayers;
       });
     }
+    setHasUnsavedChanges(true);
   };
+
 
   // Functie om modal te openen met geselecteerde slot
   const handleOpenPlayerModal = (team: "MySquad" | "Subs", index: number) => {
@@ -218,7 +223,7 @@ const FantasyTeam = () => {
   return (
     <div className="relative h-screen bg-[#0b0b0b] overflow-hidden">
       {/* Achtergrond met V-vormige lichtbundels */}
-      <div className="absolute inset-0 z-0">
+      <div className="fixed inset-0 z-0 pointer-events-none">
         <Achtergrond />
       </div>
 
@@ -226,7 +231,7 @@ const FantasyTeam = () => {
         {/* Hoofdcontent */}
         <div className="w-full px-6 pt-24 pb-24 flex flex-row gap-8 overflow-visible">
           {/* Linkerzijde - Fantasyteam sectie */}
-          <div className="flex-1 overflow-visible">
+          <div className="flex-1 overflow-visible relative z-10">
             {/* Titel Banner */}
             <div className="rounded-lg px-6 py-4 mb-6 flex items-center gap-3">
               {/* Linkerzijde - Tekst */}
@@ -245,25 +250,25 @@ const FantasyTeam = () => {
             </div>
 
             {/* My Squad sectie */}
-            <div className="mb-6">
+            <div className="mb-6 relative">
               <div className="flex items-center gap-4 mb-3">
                 <h2 className="text-base font-bold text-white ml-6 w-20">My Squad</h2>
                 {/* Puntentelling knop */}
                 <button
                   type="button"
                   onClick={() => setIsPuntentellingModalOpen(true)}
-                  className="bg-[#2b5eff] hover:bg-[#1e4fe6] text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors ml-265"
+                  className="bg-[#2b5eff] hover:bg-[#1e4fe6] text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors ml-265 relative z-30"
                 >
                   Puntentelling
                 </button>
               </div>
-              <div className="flex gap-4 flex-wrap justify-center overflow-visible">
+              <div className="flex gap-4 flex-wrap justify-center overflow-visible relative">
                 {/* My Squad spelerkaarten */}
                 {mySquadPlayers.map((player, index) => (
                   player ? (
                     <div
                       key={index}
-                      className="w-48 h-48 rounded-2xl overflow-hidden shadow-lg relative border-2 border-[#f68b32] bg-[#1a1a1a] flex flex-col"
+                      className="w-48 h-48 rounded-2xl overflow-hidden shadow-lg relative border-2 border-[#f68b32] bg-[#1a1a1a] flex flex-col z-10"
                     >
                       {/* Prullenbak icoon rechtsboven */}
                       <button
@@ -298,21 +303,29 @@ const FantasyTeam = () => {
                       </div>
 
                       {/* Speler afbeelding */}
-                      <div className="w-full h-32 bg-gray-800 flex items-center justify-center shrink-0">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-20 w-20 text-gray-600"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                      <div className="w-full h-32 bg-gray-800 flex items-center justify-center shrink-0 overflow-hidden">
+                        {player.image ? (
+                          <img
+                            src={player.image}
+                            alt={player.name}
+                            className="w-full h-full object-contain"
                           />
-                        </svg>
+                        ) : (
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-20 w-20 text-gray-600"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                            />
+                          </svg>
+                        )}
                       </div>
 
                       {/* Naamtag op donkere balk */}
@@ -331,7 +344,7 @@ const FantasyTeam = () => {
                   ) : (
                     <div
                       key={index}
-                      className="w-48 h-48 rounded-2xl border-2 border-dashed border-[#f68b32] bg-[#f68b32]/10 flex items-center justify-center shadow-lg cursor-pointer hover:bg-[#f68b32]/20 transition-colors"
+                      className="w-48 h-48 rounded-2xl border-2 border-dashed border-[#f68b32] bg-[#f68b32]/10 flex items-center justify-center shadow-lg cursor-pointer hover:bg-[#f68b32]/20 transition-colors relative z-10"
                       onClick={() => handleOpenPlayerModal("MySquad", index)}
                     >
                       <svg
@@ -402,45 +415,53 @@ const FantasyTeam = () => {
                       </div>
 
                       {/* Speler afbeelding */}
-                      <div className="w-full h-32 bg-gray-800 flex items-center justify-center shrink-0">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-20 w-20 text-gray-600"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                      <div className="w-full h-32 bg-gray-800 flex items-center justify-center shrink-0 overflow-hidden">
+                        {player.image ? (
+                          <img
+                            src={player.image}
+                            alt={player.name}
+                            className="w-full h-full object-contain"
                           />
-                        </svg>
+                        ) : (
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-20 w-20 text-gray-600"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                            />
+                          </svg>
+                        )}
                       </div>
 
                       {/* Naamtag op donkere balk */}
-                      <div className="bg-[#1a1a1a] px-2 sm:px-3 py-0 flex flex-col justify-center shrink-0">
-                        <h3 className="text-white font-semibold text-xs sm:text-sm text-center pt-1">
+                      <div className="bg-[#1a1a1a] px-3 py-0 flex flex-col justify-center shrink-0">
+                        <h3 className="text-white font-semibold text-sm text-center pt-1">
                           {player.name}
                         </h3>
                         {/* Lijn met fade */}
                         <div className="w-full h-px bg-linear-to-r from-transparent via-gray-600 to-transparent my-0.5"></div>
                         {/* Waarde */}
                         <div className="text-center pb-1">
-                          <span className="text-gray-300 text-[10px] sm:text-xs">{player.value}</span>
+                          <span className="text-gray-300 text-xs">{player.value}</span>
                         </div>
                       </div>
                     </div>
                   ) : (
                     <div
                       key={index}
-                      className="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 rounded-xl sm:rounded-2xl border-2 border-dashed border-[#2b5eff] bg-[#2b5eff]/10 flex items-center justify-center shadow-lg cursor-pointer hover:bg-[#2b5eff]/20 transition-colors"
+                      className="w-48 h-48 rounded-2xl border-2 border-dashed border-[#2b5eff] bg-[#2b5eff]/10 flex items-center justify-center shadow-lg cursor-pointer hover:bg-[#2b5eff]/20 transition-colors"
                       onClick={() => handleOpenPlayerModal("Subs", index)}
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        className="h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 text-gray-400"
+                        className="h-12 w-12 text-gray-400"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -460,10 +481,10 @@ const FantasyTeam = () => {
           </div>
 
           {/* Rechterzijpaneel - Top 10 */}
-          <div className="w-[353px] bg-[#1a1a1a] rounded-2xl p-[21px] shadow-lg mt-4">
+          <div className="w-[353px] bg-[#1a1a1a] rounded-2xl p-[21px] shadow-lg mt-4 shrink-0 relative z-0 h-[calc(100vh-8rem)] flex flex-col">
             <h2 className="text-base font-bold text-white mb-[17px]">Top 10</h2>
 
-            <div className="space-y-[11px] mb-4">
+            <div className="space-y-[11px] mb-4 flex-1 overflow-y-auto">
               {top10.map((player) => (
                 <div
                   key={player.rank}
@@ -542,7 +563,7 @@ const FantasyTeam = () => {
         {/* Budget en Opslaan - Fixed onderaan */}
         <div className="fixed bottom-0 left-0 z-20 bg-[#0c0c0c]">
           <div className="px-6 py-4">
-            <div className="flex items-center justify-between bg-[#1a1a1a] rounded-xl px-6 py-4" style={{ width: 'calc((118vw - 3rem) * 0.65)' }}>
+            <div className="flex items-center justify-between bg-[#1a1a1a] rounded-xl px-6 py-4" style={{ width: 'calc((120.5vw - 3rem) * 0.65)' }}>
               <div className="flex items-center gap-2">
                 <span className="text-white font-semibold">Budget:</span>
                 <span className={`font-bold text-lg ${remainingBudget < 0 ? "text-red-500" : "text-[#2b5eff]"}`}>
@@ -551,7 +572,12 @@ const FantasyTeam = () => {
               </div>
               <button
                 type="button"
-                className="bg-[#2b5eff] hover:bg-[#1e4fe6] text-white px-8 py-3 rounded-lg font-bold transition-colors"
+                onClick={handleSaveClick}
+                className={`${
+                  hasUnsavedChanges
+                    ? "bg-[#2b5eff] hover:bg-[#1e4fe6]"
+                    : "bg-[#1e3a8a] hover:bg-[#1e3a8a]"
+                } text-white px-8 py-3 rounded-lg font-bold transition-colors`}
               >
                 Opslaan
               </button>
@@ -666,21 +692,29 @@ const FantasyTeam = () => {
                   }`}
                 >
                   {/* Speler afbeelding */}
-                  <div className="w-16 h-16 rounded-lg bg-gray-800 flex items-center justify-center shrink-0">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-10 w-10 text-gray-600"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  <div className="w-16 h-16 rounded-lg bg-gray-800 flex items-center justify-center shrink-0 overflow-hidden">
+                    {player.image ? (
+                      <img
+                        src={player.image}
+                        alt={player.name}
+                        className="w-full h-full object-contain"
                       />
-                    </svg>
+                    ) : (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-10 w-10 text-gray-600"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                        />
+                      </svg>
+                    )}
                   </div>
 
                   {/* Speler info */}
@@ -758,7 +792,7 @@ const FantasyTeam = () => {
       {/* Puntentelling Modal */}
       {isPuntentellingModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-[#1a1a1a] rounded-lg w-full max-w-2xl mx-4 overflow-hidden shadow-2xl relative">
+          <div className="bg-[#1a1a1a] rounded-lg w-full max-w-2xl mx-4 overflow-hidden shadow-2xl relative h-[600px] flex flex-col">
             {/* Close button */}
             <button
               type="button"
@@ -783,17 +817,16 @@ const FantasyTeam = () => {
             </button>
 
             {/* Counter-Strike 2 Image */}
-            <div className="w-full h-48 bg-gradient-to-r from-gray-800 via-orange-600 to-gray-800 relative overflow-hidden">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center">
-                  <h2 className="text-white text-2xl font-bold mb-2">COUNTER STRIKE 2</h2>
-                  <p className="text-white/80 text-sm">LIMITED TEST</p>
-                </div>
-              </div>
+            <div className="w-full h-48 relative overflow-hidden shrink-0">
+              <img
+                src="/images/puntentelling.png"
+                alt="Counter-Strike 2 Limited Test"
+                className="w-full h-full object-cover"
+              />
             </div>
 
             {/* Tabs */}
-            <div className="flex border-b border-gray-700">
+            <div className="flex border-b border-gray-700 shrink-0">
               <button
                 type="button"
                 onClick={() => setActiveTab("team")}
@@ -819,103 +852,103 @@ const FantasyTeam = () => {
             </div>
 
             {/* Content */}
-            <div className="p-6">
+            <div className="p-4 flex-1 overflow-y-auto min-h-0">
               {activeTab === "team" ? (
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-3 gap-3">
                   {/* Round Win Card */}
-                  <div className="bg-[#0c0c0c] rounded-lg p-4 border border-gray-700">
-                    <h3 className="text-white text-sm font-semibold mb-3">round win</h3>
-                    <button className="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded font-semibold transition-colors">
+                  <div className="bg-[#0c0c0c] rounded-lg p-3 border border-gray-700 h-80 flex flex-col justify-between">
+                    <h3 className="text-white text-xl font-semibold text-center">round win</h3>
+                    <button className="w-full bg-green-600 hover:bg-green-700 text-white py-1.5 px-3 rounded text-xs font-semibold transition-colors">
                       +5 p
                     </button>
                   </div>
 
                   {/* Game Win Card */}
-                  <div className="bg-[#0c0c0c] rounded-lg p-4 border border-gray-700">
-                    <h3 className="text-white text-sm font-semibold mb-3">game win</h3>
-                    <button className="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded font-semibold transition-colors">
+                  <div className="bg-[#0c0c0c] rounded-lg p-3 border border-gray-700 h-80 flex flex-col justify-between">
+                    <h3 className="text-white text-xl font-semibold text-center">game win</h3>
+                    <button className="w-full bg-green-600 hover:bg-green-700 text-white py-1.5 px-3 rounded text-xs font-semibold transition-colors">
                       +10 p
                     </button>
                   </div>
 
                   {/* Round Lose Card */}
-                  <div className="bg-[#0c0c0c] rounded-lg p-4 border border-gray-700">
-                    <h3 className="text-white text-sm font-semibold mb-3">round lose</h3>
-                    <button className="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded font-semibold transition-colors">
+                  <div className="bg-[#0c0c0c] rounded-lg p-3 border border-gray-700 h-80 flex flex-col justify-between">
+                    <h3 className="text-white text-xl font-semibold text-center">round lose</h3>
+                    <button className="w-full bg-red-600 hover:bg-red-700 text-white py-1.5 px-3 rounded text-xs font-semibold transition-colors">
                       -5 p
                     </button>
                   </div>
                 </div>
               ) : (
-                <div className="space-y-2">
+                <div className="grid grid-cols-2 gap-3">
                   {/* Kills */}
-                  <div className="bg-[#0c0c0c] rounded-lg p-4 border border-gray-700 flex items-center justify-between">
-                    <span className="text-white text-sm font-semibold">Kills</span>
-                    <button className="bg-green-600 hover:bg-green-700 text-white py-1 px-4 rounded font-semibold transition-colors">
+                  <div className="bg-[#0c0c0c] rounded-lg p-3 border border-gray-700 flex items-center justify-between">
+                    <span className="text-white text-xs font-semibold">Kills</span>
+                    <button className="bg-green-600 hover:bg-green-700 text-white py-1 px-3 rounded text-xs font-semibold transition-colors">
                       +2p
                     </button>
                   </div>
 
                   {/* Deaths */}
-                  <div className="bg-[#0c0c0c] rounded-lg p-4 border border-gray-700 flex items-center justify-between">
-                    <span className="text-white text-sm font-semibold">Deaths</span>
-                    <button className="bg-red-600 hover:bg-red-700 text-white py-1 px-4 rounded font-semibold transition-colors">
+                  <div className="bg-[#0c0c0c] rounded-lg p-3 border border-gray-700 flex items-center justify-between">
+                    <span className="text-white text-xs font-semibold">Deaths</span>
+                    <button className="bg-red-600 hover:bg-red-700 text-white py-1 px-3 rounded text-xs font-semibold transition-colors">
                       -2p
                     </button>
                   </div>
 
                   {/* Assist */}
-                  <div className="bg-[#0c0c0c] rounded-lg p-4 border border-gray-700 flex items-center justify-between">
-                    <span className="text-white text-sm font-semibold">Assist</span>
-                    <button className="bg-green-600 hover:bg-green-700 text-white py-1 px-4 rounded font-semibold transition-colors">
+                  <div className="bg-[#0c0c0c] rounded-lg p-3 border border-gray-700 flex items-center justify-between">
+                    <span className="text-white text-xs font-semibold">Assist</span>
+                    <button className="bg-green-600 hover:bg-green-700 text-white py-1 px-3 rounded text-xs font-semibold transition-colors">
                       +3p
                     </button>
                   </div>
 
                   {/* KAST <70% */}
-                  <div className="bg-[#0c0c0c] rounded-lg p-4 border border-gray-700 flex items-center justify-between">
-                    <span className="text-white text-sm font-semibold">KAST &lt;70%</span>
-                    <button className="bg-red-600 hover:bg-red-700 text-white py-1 px-4 rounded font-semibold transition-colors">
+                  <div className="bg-[#0c0c0c] rounded-lg p-3 border border-gray-700 flex items-center justify-between">
+                    <span className="text-white text-xs font-semibold">KAST &lt;70%</span>
+                    <button className="bg-red-600 hover:bg-red-700 text-white py-1 px-3 rounded text-xs font-semibold transition-colors">
                       -1p
                     </button>
                   </div>
 
                   {/* KAST 70% - 80% */}
-                  <div className="bg-[#0c0c0c] rounded-lg p-4 border border-gray-700 flex items-center justify-between">
-                    <span className="text-white text-sm font-semibold">KAST 70% - 80%</span>
-                    <button className="bg-green-600 hover:bg-green-700 text-white py-1 px-4 rounded font-semibold transition-colors">
+                  <div className="bg-[#0c0c0c] rounded-lg p-3 border border-gray-700 flex items-center justify-between">
+                    <span className="text-white text-xs font-semibold">KAST 70% - 80%</span>
+                    <button className="bg-green-600 hover:bg-green-700 text-white py-1 px-3 rounded text-xs font-semibold transition-colors">
                       +1p
                     </button>
                   </div>
 
                   {/* KAST 80% - 90% */}
-                  <div className="bg-[#0c0c0c] rounded-lg p-4 border border-gray-700 flex items-center justify-between">
-                    <span className="text-white text-sm font-semibold">KAST 80% - 90%</span>
-                    <button className="bg-green-600 hover:bg-green-700 text-white py-1 px-4 rounded font-semibold transition-colors">
+                  <div className="bg-[#0c0c0c] rounded-lg p-3 border border-gray-700 flex items-center justify-between">
+                    <span className="text-white text-xs font-semibold">KAST 80% - 90%</span>
+                    <button className="bg-green-600 hover:bg-green-700 text-white py-1 px-3 rounded text-xs font-semibold transition-colors">
                       +2p
                     </button>
                   </div>
 
                   {/* KAST 90%> */}
-                  <div className="bg-[#0c0c0c] rounded-lg p-4 border border-gray-700 flex items-center justify-between">
-                    <span className="text-white text-sm font-semibold">KAST 90%&gt;</span>
-                    <button className="bg-green-600 hover:bg-green-700 text-white py-1 px-4 rounded font-semibold transition-colors">
+                  <div className="bg-[#0c0c0c] rounded-lg p-3 border border-gray-700 flex items-center justify-between">
+                    <span className="text-white text-xs font-semibold">KAST 90%&gt;</span>
+                    <button className="bg-green-600 hover:bg-green-700 text-white py-1 px-3 rounded text-xs font-semibold transition-colors">
                       +3p
                     </button>
                   </div>
 
                   {/* DMG 1500> */}
-                  <div className="bg-[#0c0c0c] rounded-lg p-4 border border-gray-700 flex items-center justify-between">
-                    <span className="text-white text-sm font-semibold">DMG 1500&gt;</span>
-                    <button className="bg-green-600 hover:bg-green-700 text-white py-1 px-4 rounded font-semibold transition-colors">
+                  <div className="bg-[#0c0c0c] rounded-lg p-3 border border-gray-700 flex items-center justify-between">
+                    <span className="text-white text-xs font-semibold">DMG 1500&gt;</span>
+                    <button className="bg-green-600 hover:bg-green-700 text-white py-1 px-3 rounded text-xs font-semibold transition-colors">
                       +4p
                     </button>
                   </div>
 
                   {/* MVP per ronde */}
-                  <div className="bg-[#0c0c0c] rounded-lg p-4 border border-gray-700 flex items-center justify-between">
-                    <span className="text-white text-sm font-semibold">MVP per ronde</span>
-                    <button className="bg-green-600 hover:bg-green-700 text-white py-1 px-4 rounded font-semibold transition-colors">
+                  <div className="bg-[#0c0c0c] rounded-lg p-3 border border-gray-700 flex items-center justify-between">
+                    <span className="text-white text-xs font-semibold">MVP per ronde</span>
+                    <button className="bg-green-600 hover:bg-green-700 text-white py-1 px-3 rounded text-xs font-semibold transition-colors">
                       +1p
                     </button>
                   </div>
