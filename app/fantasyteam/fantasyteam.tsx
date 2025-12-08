@@ -2,12 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Achtergrond from "../../components/Achtergrond";
-
-type Player = {
-  name: string;
-  price: string;
-  image?: string; // URL of path to player image
-};
+import Image from "next/image";
 
 type AvailablePlayer = {
   name: string;
@@ -559,7 +554,7 @@ const FantasyTeam = () => {
               setSelectedSlot(null);
             }}
           />
-          
+
           {/* Modal */}
           <div className="fixed right-0 top-0 bottom-0 w-[500px] bg-[#1a1a1a] z-40 shadow-2xl overflow-y-auto transform transition-transform duration-300 ease-out">
             {/* Header */}
@@ -587,7 +582,7 @@ const FantasyTeam = () => {
                     />
                   </svg>
                 </button>
-                
+
                 {/* Filter icon */}
                 <button
                   type="button"
@@ -609,7 +604,7 @@ const FantasyTeam = () => {
                     />
                   </svg>
                 </button>
-                
+
                 {/* Close button */}
                 <button
                   type="button"
@@ -644,7 +639,9 @@ const FantasyTeam = () => {
                 <div
                   key={index}
                   className={`bg-[#0c0c0c] rounded-lg p-4 flex items-center gap-4 border-b-2 ${
-                    player.teamColor === "orange" ? "border-[#f68b32]" : "border-[#fbbf24]"
+                    player.teamColor === "orange"
+                      ? "border-[#f68b32]"
+                      : "border-[#fbbf24]"
                   }`}
                 >
                   {/* Speler afbeelding */}
@@ -667,16 +664,24 @@ const FantasyTeam = () => {
 
                   {/* Speler info */}
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-white font-bold text-lg mb-1">{player.name}</h3>
+                    <h3 className="text-white font-bold text-lg mb-1">
+                      {player.name}
+                    </h3>
                     <div className="flex items-center gap-2">
                       {/* Team logo */}
-                      <div className="w-4 h-4 rounded flex items-center justify-center shrink-0 overflow-hidden">
-                        <img
-                          src={player.team === "PAPANEUS" ? "/images/papaneus.png" : "/images/morrog.png"}
+                      <div className="w-4 h-4 rounded flex items-center justify-center shrink-0 overflow-hidden relative">
+                        <Image
+                          src={
+                            player.team === "PAPANEUS"
+                              ? "/images/papaneus.png"
+                              : "/images/morrog.png"
+                          }
                           alt={player.team}
-                          className="w-full h-full object-contain"
+                          fill
+                          className="object-contain"
                         />
                       </div>
+
                       <span
                         className={`text-sm font-medium ${
                           player.teamColor === "orange"
@@ -690,7 +695,9 @@ const FantasyTeam = () => {
                   </div>
 
                   {/* Waarde */}
-                  <div className="text-white font-semibold mr-4">{player.value}</div>
+                  <div className="text-white font-semibold mr-4">
+                    {player.value}
+                  </div>
 
                   {/* Actie button */}
                   <button
