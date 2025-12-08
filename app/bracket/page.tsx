@@ -84,9 +84,7 @@ export default function BracketPage() {
                                 </div>
                             )}
 
-                            {!error && !isLoading && bracketMatches.length > 0 && (
-                                <Bracket matches={bracketMatches} />
-                            )}
+                            
                         </div>
                     </div>
                 </section>
