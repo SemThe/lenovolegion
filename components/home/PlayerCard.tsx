@@ -13,7 +13,7 @@ export default function PlayerCard() {
       </h2>
       <div className="absolute right-10 top-10 translate-1/2">
         <Image
-          src="/images/logo-teams/papaneus.png"
+          src="/images/papaneus.png"
           alt="Papaneus-logo"
           width={78}
           height={78}
@@ -24,7 +24,7 @@ export default function PlayerCard() {
       {/* Foto van speler */}
       <div className="absolute  bottom-0 z-10">
         <Image
-          src="/images/spelers/twistzz.png"
+          src="/images/twistzz.png"
           alt="Twistzz"
           width={294}
           height={263}

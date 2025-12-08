@@ -1,5 +1,5 @@
 import Link from "next/link";
-
+import BekijkIcon from "@/public/icons/bekijk.svg";
 interface BekijkBtnProps {
   href: string;
 }
