@@ -34,6 +34,9 @@ const FantasyTeam = () => {
     null,
   ]);
 
+  // State voor remaining budget
+  const [remainingBudget, setRemainingBudget] = useState<number>(16000);
+
   // Startbudget
   const START_BUDGET = 16000;
 
@@ -69,9 +72,6 @@ const FantasyTeam = () => {
     return mySquadTotal + subsTotal;
   };
 
-  // Bereken resterend budget
-  const remainingBudget = START_BUDGET - calculateTotalSpent();
-
   // Functie om team op te slaan in localStorage
   const saveTeamToLocalStorage = () => {
     if (typeof window === 'undefined') return;
@@ -95,8 +95,14 @@ const FantasyTeam = () => {
     saveTeamToLocalStorage();
   };
 
-  // Functie om team te laden uit localStorage
-  const loadTeamFromLocalStorage = () => {
+  // Update remainingBudget wanneer spelers veranderen
+  useEffect(() => {
+    const totalSpent = calculateTotalSpent();
+    setRemainingBudget(START_BUDGET - totalSpent);
+  }, [mySquadPlayers, subsPlayers]);
+
+  // Laad team uit localStorage bij mount
+  useEffect(() => {
     if (typeof window === 'undefined') return;
     
     try {
@@ -111,11 +117,6 @@ const FantasyTeam = () => {
     } catch (error) {
       console.error('Error loading team from localStorage:', error);
     }
-  };
-
-  // Laad team bij mount
-  useEffect(() => {
-    loadTeamFromLocalStorage();
   }, []);
 
   // Markeer als er wijzigingen zijn wanneer spelers worden toegevoegd/verwijderd
