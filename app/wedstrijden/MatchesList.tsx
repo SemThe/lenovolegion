@@ -94,10 +94,6 @@ function TeamBlock({ team }: { team: TeamInfo | null }) {
 }
 
 export function Bracket({ matches }: { matches: (MatchListItem | null)[] }) {
-  const [activeTab, setActiveTab] = useState<"ronde1" | "halve" | "finale">(
-    "ronde1"
-  );
-
   // Rounds mapping
   const round1 = matches.slice(0, 4);
   const semi = matches.slice(4, 6);
@@ -114,65 +110,34 @@ export function Bracket({ matches }: { matches: (MatchListItem | null)[] }) {
   }
 
   return (
-    <div className=" p-6 rounded-xl h-full relative overflow-visible">
-      {/* Tabs */}
-      <div className="flex gap-2 mb-6 border-b border-white/10 pb-2">
-        <button
-          onClick={() => setActiveTab("ronde1")}
-          className={`px-4 py-2 text-sm font-semibold transition-colors ${
-            activeTab === "ronde1"
-              ? "text-white border-b-2 border-white"
-              : "text-gray-400 hover:text-white"
-          }`}
-        >
-          Ronde 1
-        </button>
-        <button
-          onClick={() => setActiveTab("halve")}
-          className={`px-4 py-2 text-sm font-semibold transition-colors ${
-            activeTab === "halve"
-              ? "text-white border-b-2 border-white"
-              : "text-gray-400 hover:text-white"
-          }`}
-        >
-          Halve Finale
-        </button>
-        <button
-          onClick={() => setActiveTab("finale")}
-          className={`px-4 py-2 text-sm font-semibold transition-colors ${
-            activeTab === "finale"
-              ? "text-white border-b-2 border-white"
-              : "text-gray-400 hover:text-white"
-          }`}
-        >
-          Finale
-        </button>
-      </div>
-
-      {/* BRACKET GRID - Responsive columns */}
-      <div className="relative flex flex-col xl:flex-row gap-6 xl:gap-8 items-stretch xl:items-start min-h-[500px]">
-        {/* Round 1 Column */}
-        <div className="w-full xl:flex-1 min-w-0">
+    <div className="p-6 rounded-xl h-full relative overflow-visible">
+      {/* BRACKET GRID - Piramide vorm zoals op hoofdpagina */}
+      <div className="flex flex-row items-center justify-center gap-4 h-full overflow-x-auto">
+        {/* Kwartfinales - Links */}
+        <div className="flex-1 min-w-0 space-y-2 flex flex-col items-center">
+          <div className="text-xs font-semibold text-white/80 mb-2 w-full text-center">Kwartfinales</div>
           <BracketRound matches={round1} />
         </div>
 
-        {/* Connection Lines Column 1 (Round 1 to Semi) */}
-        <div className="relative w-full xl:w-16 flex-shrink-0 hidden xl:block">
+        {/* Verbindingslijnen naar Halve Finale */}
+        <div className="relative w-8 flex-shrink-0 flex items-center" style={{ height: `${(124 + 8) * 4}px` }}>
           <BracketLinesRound1ToSemi />
         </div>
 
-        {/* Semi-Finals Column */}
-        <div className="w-full xl:flex-1 min-w-0">
+        {/* Halve Finale - Midden */}
+        <div className="flex-1 min-w-0 space-y-4 flex flex-col items-center">
+          <div className="text-xs font-semibold text-white/80 mb-2 w-full text-center">Halve Finale</div>
           <BracketRound matches={semiWithEmpty} showEmpty={true} />
         </div>
 
-        {/* Connection Lines Column 2 (Semi to Final) */}
-        <div className="relative w-full xl:w-16 flex-shrink-0 hidden xl:block">
+        {/* Verbindingslijnen naar Finale */}
+        <div className="relative w-8 flex-shrink-0 flex items-center" style={{ height: `${(124 + 16) * 2}px` }}>
           <BracketLinesSemiToFinal />
         </div>
 
-        {/* Finals Column */}
-        <div className="w-full xl:flex-1 min-w-0">
+        {/* Finale - Rechts */}
+        <div className="flex-1 min-w-0 flex flex-col items-center justify-center">
+          <div className="text-xs font-semibold text-white/80 mb-2 w-full text-center">Finale</div>
           <BracketRound matches={finaleWithEmpty} showEmpty={true} />
         </div>
       </div>
@@ -182,76 +147,31 @@ export function Bracket({ matches }: { matches: (MatchListItem | null)[] }) {
 
 /* BRACKET LINES - Round 1 to Semi-Finals */
 function BracketLinesRound1ToSemi() {
-  // Layout baseline for the connector math:
-  // - Bracket cards are fixed at 100px tall (see BracketRound h-[100px])
-  // - Tailwind space-y-6 keeps 24px between cards
-  // - Date label/padding offsets the first card ~40px from the top
-  const matchHeight = 100;
-  const matchGap = 24;
-  const matchStart = 40;
-  const cardHeight = matchHeight;
+  // Berekeningen gebaseerd op werkelijke card structuur
+  // BracketRound: date (~20px mb-3) + team rows (~48px elk) + margin (8px mb-2) = ~124px totaal
+  const cardHeight = 124; // Totale card hoogte inclusief date
+  const cardGap = 8; // space-y-2 = 8px
+  const dateHeight = 20; // Date label hoogte
+  const cardContentHeight = cardHeight - dateHeight; // 104px (zonder date)
+  // Midden van card content: dateHeight + cardContentHeight / 2 = 20 + 52 = 72px
+  const cardCenterOffset = dateHeight + cardContentHeight / 2;
 
   return (
-    <div className="relative h-full">
-      {/* Match 1 & 2 to Semi-Final 1 */}
-      <div className="absolute" style={{ top: `${matchStart}px` }}>
-        {/* Horizontal line from match 1 */}
-        <div
-          className="absolute left-0 w-8 h-[1px] bg-white/20"
-          style={{ top: `${cardHeight / 2 - 1}px` }}
-        />
-        {/* Horizontal line from match 2 */}
-        <div
-          className="absolute left-0 w-8 h-[1px] bg-white/20"
-          style={{ top: `${cardHeight / 2 - 1 + matchHeight + matchGap}px` }}
-        />
-        {/* Vertical line connecting to semi-final */}
-        <div
-          className="absolute left-8 w-[1px] bg-white/20"
-          style={{
-            top: `${cardHeight / 2 - 1}px`,
-            height: `${matchHeight + matchGap + 1}px`,
-          }}
-        />
-        {/* Horizontal line to semi-final 1 */}
-        <div
-          className="absolute left-8 w-8 h-[1px] bg-white/20"
-          style={{
-            top: `${cardHeight / 2 - 1 + (matchHeight + matchGap) / 2}px`,
-          }}
-        />
+    <div className="absolute inset-0">
+      {/* Match 1 & 2 naar Halve Finale 1 */}
+      <div className="absolute" style={{ top: `${cardCenterOffset}px` }}>
+        <div className="absolute left-0 w-4 h-[1px] bg-white/25" style={{ top: "0px" }} />
+        <div className="absolute left-0 w-4 h-[1px] bg-white/25" style={{ top: `${cardHeight + cardGap}px` }} />
+        <div className="absolute left-4 w-[1px] bg-white/25" style={{ top: "0px", height: `${cardHeight + cardGap}px` }} />
+        <div className="absolute left-4 w-4 h-[1px] bg-white/25" style={{ top: `${(cardHeight + cardGap) / 2}px` }} />
       </div>
 
-      {/* Match 3 & 4 to Semi-Final 2 */}
-      <div
-        className="absolute"
-        style={{ top: `${matchStart + (matchHeight + matchGap) * 2}px` }}
-      >
-        {/* Horizontal line from match 3 */}
-        <div
-          className="absolute left-0 w-8 h-[1px] bg-white/20"
-          style={{ top: `${cardHeight / 2 - 1}px` }}
-        />
-        {/* Horizontal line from match 4 */}
-        <div
-          className="absolute left-0 w-8 h-[1px] bg-white/20"
-          style={{ top: `${cardHeight / 2 - 1 + matchHeight + matchGap}px` }}
-        />
-        {/* Vertical line connecting to semi-final */}
-        <div
-          className="absolute left-8 w-[1px] bg-white/20"
-          style={{
-            top: `${cardHeight / 2 - 1}px`,
-            height: `${matchHeight + matchGap + 1}px`,
-          }}
-        />
-        {/* Horizontal line to semi-final 2 */}
-        <div
-          className="absolute left-8 w-8 h-[1px] bg-white/20"
-          style={{
-            top: `${cardHeight / 2 - 1 + (matchHeight + matchGap) / 2}px`,
-          }}
-        />
+      {/* Match 3 & 4 naar Halve Finale 2 */}
+      <div className="absolute" style={{ top: `${cardCenterOffset + (cardHeight + cardGap) * 2}px` }}>
+        <div className="absolute left-0 w-4 h-[1px] bg-white/25" style={{ top: "0px" }} />
+        <div className="absolute left-0 w-4 h-[1px] bg-white/25" style={{ top: `${cardHeight + cardGap}px` }} />
+        <div className="absolute left-4 w-[1px] bg-white/25" style={{ top: "0px", height: `${cardHeight + cardGap}px` }} />
+        <div className="absolute left-4 w-4 h-[1px] bg-white/25" style={{ top: `${(cardHeight + cardGap) / 2}px` }} />
       </div>
     </div>
   );
@@ -259,40 +179,21 @@ function BracketLinesRound1ToSemi() {
 
 /* BRACKET LINES - Semi-Finals to Final */
 function BracketLinesSemiToFinal() {
-  const matchHeight = 100;
-  const matchGap = 24;
-  const matchStart = 40;
-  const cardHeight = matchHeight;
+  // Berekeningen voor lijn positionering - aangepast voor piramide layout
+  const cardHeight = 124; // Totale card hoogte inclusief date (zelfde als kwartfinales)
+  const cardGap = 16; // space-y-4 voor halve finale = 16px
+  const dateHeight = 20; // Date label hoogte
+  const cardContentHeight = cardHeight - dateHeight; // Hoogte zonder date (104px)
+  const cardCenterOffset = dateHeight + cardContentHeight / 2; // Midden van card content (72px)
 
   return (
-    <div className="relative h-full">
-      {/* Semi-Final 1 & 2 to Final */}
-      <div className="absolute" style={{ top: `${matchStart}px` }}>
-        {/* Horizontal line from semi-final 1 */}
-        <div
-          className="absolute left-0 w-8 h-[1px] bg-white/20"
-          style={{ top: `${cardHeight / 2 - 1}px` }}
-        />
-        {/* Horizontal line from semi-final 2 */}
-        <div
-          className="absolute left-0 w-8 h-[1px] bg-white/20"
-          style={{ top: `${cardHeight / 2 - 1 + matchHeight + matchGap}px` }}
-        />
-        {/* Vertical line connecting to final */}
-        <div
-          className="absolute left-8 w-[1px] bg-white/20"
-          style={{
-            top: `${cardHeight / 2 - 1}px`,
-            height: `${matchHeight + matchGap + 1}px`,
-          }}
-        />
-        {/* Horizontal line to final */}
-        <div
-          className="absolute left-8 w-8 h-[1px] bg-white/20"
-          style={{
-            top: `${cardHeight / 2 - 1 + (matchHeight + matchGap) / 2}px`,
-          }}
-        />
+    <div className="absolute inset-0">
+      {/* Halve Finale 1 & 2 naar Finale */}
+      <div className="absolute" style={{ top: `${cardCenterOffset}px` }}>
+        <div className="absolute left-0 w-4 h-[1px] bg-white/25" style={{ top: "0px" }} />
+        <div className="absolute left-0 w-4 h-[1px] bg-white/25" style={{ top: `${cardHeight + cardGap}px` }} />
+        <div className="absolute left-4 w-[1px] bg-white/25" style={{ top: "0px", height: `${cardHeight + cardGap}px` }} />
+        <div className="absolute left-4 w-4 h-[1px] bg-white/25" style={{ top: `${(cardHeight + cardGap) / 2}px` }} />
       </div>
     </div>
   );
@@ -326,7 +227,7 @@ function BracketRound({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-2">
       {matches.map((m, index) => {
         if (!m && showEmpty) {
           return (

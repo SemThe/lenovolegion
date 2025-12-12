@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import BekijkButton from "../ui/BekijkButton";
+import BracketPreview from "./BracketPreview";
 
-import { Bracket } from "@/app/wedstrijden/MatchesList";
 import type { MatchListItem } from "@/app/api/matches/route";
 
 export default function BracketView() {
@@ -49,8 +49,8 @@ export default function BracketView() {
   }, [matches]);
 
   return (
-    <div className="relative h-[440px] bg-widget-bg border border-widget-border rounded-[10px]">
-      <div className="px-6 pb-6">
+    <div className="relative h-[440px] bg-widget-bg border border-widget-border rounded-[10px] flex flex-col overflow-hidden">
+      <div className="flex-1 overflow-y-auto px-6 pt-6 pb-16">
         {error && (
           <div className="py-10 text-center text-red-400 text-sm border border-red-500/30 rounded-2xl bg-red-500/10">
             {error}
@@ -70,10 +70,10 @@ export default function BracketView() {
         )}
 
         {!error && !isLoading && bracketMatches.length > 0 && (
-          <Bracket matches={bracketMatches} />
+          <BracketPreview matches={bracketMatches} />
         )}
       </div>
-      <div className="absolute bottom-5 right-5">
+      <div className="absolute bottom-5 right-5 z-10">
         <BekijkButton href="/bracket" />
       </div>
     </div>

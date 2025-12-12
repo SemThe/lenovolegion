@@ -64,7 +64,7 @@ export default function WedstrijdenPage() {
       <BackgroundLines leftColor="#2872FD" rightColor="#FD822A" />
 
       <main className="flex-1 flex justify-center px-4 pb-12">
-        <section className="w-full mt-10">
+        <section className="w-full mt-16">
           <div className="bg-[#262626] border border-[#393939] rounded-[10px]">
             {/* Header */}
             <header className="px-6 pt-6 pb-2 space-y-5">
@@ -110,7 +110,7 @@ export default function WedstrijdenPage() {
             </header>
 
             {/* Scroll-container */}
-            <div className="px-6 pt-6 pb-6 h-[620px] overflow-y-auto modern-scrollbar mx-32">
+            <div className="px-6 pt-6 pb-6 h-[720px] overflow-y-auto modern-scrollbar mx-32">
               <div className="space-y-3">
                 {filteredMatches.length === 0 && (
                   <div className="py-10 text-center text-white/60 text-sm border border-white/10 rounded-2xl bg-black/20">

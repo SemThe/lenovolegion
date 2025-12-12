@@ -4,19 +4,10 @@ import { useEffect, useMemo, useState } from "react";
 import { NavigationHeader } from "../wedstrijden/NavigationHeader";
 import { Bracket } from "../wedstrijden/MatchesList";
  
-interface Match {
-    id: number;
-    match_date: string;
-    status: string;
-    score_team1: number | null;
-    score_team2: number | null;
-    tournament: { name: string } | null;
-    team1: { name: string; logo_url: string } | null;
-    team2: { name: string; logo_url: string } | null;
-}
+import type { MatchListItem } from "@/app/api/matches/route";
  
 export default function BracketPage() {
-    const [matches, setMatches] = useState<Match[]>([]);
+    const [matches, setMatches] = useState<MatchListItem[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
  
@@ -38,8 +29,8 @@ export default function BracketPage() {
  
     const bracketMatches = useMemo(() => {
         const sorted = [...matches].sort((a, b) => {
-            const dateA = new Date(a.match_date).getTime();
-            const dateB = new Date(b.match_date).getTime();
+            const dateA = a.match_date ? new Date(a.match_date).getTime() : 0;
+            const dateB = b.match_date ? new Date(b.match_date).getTime() : 0;
             return dateA - dateB;
         });
  
@@ -83,10 +74,10 @@ export default function BracketPage() {
                                     Nog geen wedstrijden beschikbaar voor deze bracket.
                                 </div>
                             )}
- 
-                    
 
-                            
+                            {!error && !isLoading && bracketMatches.length > 0 && (
+                                <Bracket matches={bracketMatches} />
+                            )}
                         </div>
                     </div>
                 </section>
